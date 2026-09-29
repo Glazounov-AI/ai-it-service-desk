@@ -168,9 +168,9 @@ Extended Knowledge Base, advanced troubleshooting logic, structured escalation, 
 
 ## Current Status
 
-**Current version: v0.1 — Project Foundation**
+**Current version: v0.5 — Working Prototype**
 
-Development in progress.
+Core assistant components are implemented. Initial testing is in progress.
 
 ---
 
@@ -300,7 +300,9 @@ ai-it-service-desk/
 │   └── system-prompt.md
 ├── knowledge-base/
 │   ├── it-knowledge-base.csv
-│   └── routing-table.csv
+│   ├── it-knowledge-base.md
+│   ├── routing-table.csv
+│   └── routing-table.md
 ├── scenarios/
 │   ├── test-scenarios.md
 │   └── example-dialogues.md
@@ -334,6 +336,6 @@ ai-it-service-desk/
 
 ## Текущий статус
 
-**Текущая версия: v0.1 — Project Foundation**
+**Текущая версия: v0.5 — Working Prototype**
 
-Проект находится в разработке.
+Основные компоненты ассистента реализованы. Начинается первичное тестирование.
