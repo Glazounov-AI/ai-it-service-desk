@@ -1,0 +1,29 @@
+category;subcategory;request_type;support_group;user_can_self_resolve;admin_action_required;default_priority;escalation_condition
+ACCESS;PASSWORD;Смена или восстановление пароля;Identity & Access;yes;no;normal;Процедура из Knowledge Base не помогла или требуется административный сброс пароля
+ACCESS;ACCOUNT_LOCKED;Заблокирована учётная запись;Identity & Access;no;yes;normal;Требуется разблокировка учётной записи специалистом
+ACCESS;PERMISSIONS;Запрос или проблема с правами доступа;Identity & Access;no;yes;normal;Требуется выдача изменение или отзыв прав доступа
+ACCESS;LOGIN_FAILED;Не удаётся войти в корпоративную учётную запись;Identity & Access;yes;conditional;normal;Стандартная диагностика не помогла или требуется изменение учётной записи
+MFA;CODE_NOT_RECEIVED;Не приходит код подтверждения;Identity & Access;yes;conditional;normal;Стандартная диагностика не помогла или требуется изменение настроек MFA
+MFA;PHONE_REPLACED;Смена телефона или устройства для MFA;Identity & Access;conditional;yes;normal;Требуется перерегистрация или административное изменение MFA
+MFA;AUTHENTICATOR;Проблема с приложением-аутентификатором;Identity & Access;yes;conditional;normal;Повторная настройка по инструкции не решила проблему
+EMAIL;OUTLOOK_START;Outlook не запускается;Service Desk;yes;no;normal;Диагностика приложения не решила проблему
+EMAIL;SEND_RECEIVE;Не отправляются или не принимаются сообщения;Service Desk;yes;conditional;normal;Проблема сохраняется после стандартной диагностики
+EMAIL;PROFILE;Проблема с профилем Outlook;Service Desk;conditional;conditional;normal;Требуется пересоздание профиля или вмешательство специалиста
+EMAIL;MAILBOX_ACCESS;Нет доступа к почтовому ящику или общей почте;Identity & Access;conditional;yes;normal;Требуется изменение прав доступа к почтовому ящику
+VPN;CLIENT_START;VPN-клиент не запускается;Service Desk;yes;no;normal;Стандартная диагностика клиента не решила проблему
+VPN;AUTHENTICATION;Ошибка аутентификации VPN;Identity & Access;yes;conditional;normal;Проверка учётных данных и MFA не решила проблему
+VPN;CONNECTION;VPN-соединение не устанавливается;Network;yes;conditional;normal;Диагностика подключения не решила проблему
+VPN;RESOURCE_ACCESS;VPN подключён но корпоративные ресурсы недоступны;Network;yes;conditional;normal;Проверка подключения и доступности ресурсов не решила проблему
+SOFTWARE;INSTALL_REQUEST;Запрос на установку программного обеспечения;Workplace;conditional;yes;normal;ПО отсутствует в разрешённом каталоге или установка требует специалиста
+SOFTWARE;APP_START;Корпоративное приложение не запускается;Service Desk;yes;no;normal;Стандартная диагностика приложения не решила проблему
+SOFTWARE;APP_ERROR;Ошибка при работе приложения;Service Desk;yes;conditional;normal;Ошибка сохраняется после выполнения инструкции Knowledge Base
+SOFTWARE;UPDATE;Проблема с обновлением программного обеспечения;Workplace;yes;conditional;normal;Автоматическое или разрешённое обновление не выполняется
+HARDWARE;PC_START;Компьютер не включается или не загружается;Workplace;conditional;no;high;Базовые проверки питания и подключения не решили проблему
+HARDWARE;PERIPHERAL;Не работает клавиатура мышь гарнитура или другое периферийное устройство;Workplace;yes;no;normal;Переподключение и стандартная диагностика не помогли
+HARDWARE;PRINTER;Проблема с принтером;Workplace;yes;conditional;normal;Стандартная диагностика принтера не решила проблему
+HARDWARE;DISPLAY;Проблема с монитором или изображением;Workplace;yes;no;normal;Проверка подключения и настроек не решила проблему
+NETWORK;WIFI;Нет подключения к корпоративной Wi-Fi-сети;Network;yes;conditional;normal;Стандартная диагностика Wi-Fi не решила проблему
+NETWORK;LAN;Нет подключения по проводной сети;Network;yes;conditional;normal;Проверка кабеля подключения и сетевого адаптера не решила проблему
+NETWORK;INTERNET;Нет доступа в интернет;Network;yes;conditional;normal;Проблема не локализована на рабочей станции или затрагивает нескольких пользователей
+NETWORK;SHARED_RESOURCE;Недоступен сетевой ресурс;Network;yes;conditional;normal;Сетевое подключение работает но ресурс остаётся недоступен
+OTHER;UNKNOWN;Проблема не относится к известной категории;Service Desk;no;conditional;normal;Нет подходящей категории или статьи Knowledge Base
