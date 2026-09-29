@@ -132,7 +132,9 @@ ai-it-service-desk/
 │   └── system-prompt.md
 ├── knowledge-base/
 │   ├── it-knowledge-base.csv
-│   └── routing-table.csv
+│   ├── it-knowledge-base.md
+│   ├── routing-table.csv
+│   └── routing-table.md
 ├── scenarios/
 │   ├── test-scenarios.md
 │   └── example-dialogues.md
