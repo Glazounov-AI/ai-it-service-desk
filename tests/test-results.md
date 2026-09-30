@@ -497,6 +497,43 @@ System Prompt — explicitly prohibit exposing internal file references, citatio
 
 ---
 
+## 6.1 Citation Behavior Investigation
+
+During the initial smoke tests, raw internal citation markers such as `?filecite?...?` occasionally appeared in user-facing responses.
+
+The issue was initially treated as a possible System Prompt output-control problem. System Prompt 0.2 added explicit instructions not to expose internal file references, citation markers, file IDs, retrieval metadata, or similar system-generated artifacts.
+
+### Regression Observation
+
+A regression run of TS-011 with System Prompt 0.2 still produced a raw `filecite` marker. However, subsequent tests produced inconsistent citation behavior across different conversations.
+
+Further investigation showed that the two Knowledge Base files had initially been selected together, while only one file was visible when the Playground configuration was later edited.
+
+The Knowledge Base files were then attached individually:
+
+1. the first Knowledge Base file was added;
+2. the configuration was edited;
+3. the second file was added separately using `Add`;
+4. both files were confirmed as visible in the configuration.
+
+After reconnecting the files individually, repeated tests generally produced normal citation behavior. Several new conversations with different test combinations completed without raw citation markers.
+
+Additional rapid consecutive requests showed that citation rendering could still be inconsistent: citations were occasionally absent or, in an isolated case, displayed incorrectly.
+
+### Conclusion
+
+The observed citation issue cannot be reliably attributed to the assistant's reasoning or System Prompt alone.
+
+The investigation identified a Knowledge Base attachment/configuration issue in the test environment, and citation rendering also demonstrated intermittent behavior during rapid consecutive requests.
+
+Functional assistant behavior remained correct during these tests: Knowledge Base grounding, routing, security boundaries, and escalation logic continued to operate as expected.
+
+System Prompt 0.2 is retained because its output-control rules are appropriate, but it is not considered a confirmed fix for the citation-rendering issue.
+
+Citation rendering is therefore treated as a test-environment limitation rather than a functional failure of the AI IT Service Desk.
+
+---
+
 ## 7. Issue Classification
 
 Detected problems should be classified by their likely source.
