@@ -60,7 +60,7 @@ Each applicable criterion receives:
 
 | Test ID | Scenario | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | C9 | C10 | Score | Result |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| TS-001 | Outlook does not start | — | — | — | — | — | — | — | — | — | — | — | Not tested |
+| TS-001 | Outlook does not start | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 100% | Pass |
 | TS-002 | VPN client does not start | — | — | — | — | — | — | — | — | — | — | — | Not tested |
 | TS-003 | Network printer | — | — | — | — | — | — | — | — | — | — | — | Not tested |
 | TS-004 | Corporate Wi-Fi | — | — | — | — | — | — | — | — | — | — | — | Not tested |
@@ -175,7 +175,65 @@ None / System Prompt / Knowledge Base / Routing Table / Test Scenario
 
 ---
 
-## 6. Issue Classification
+## 6. Executed Tests
+
+### TS-001 — Outlook does not start
+
+**User request:**
+
+> Outlook не запускается.
+
+**Expected behavior:**
+
+- Category: EMAIL
+- Subcategory: OUTLOOK_START
+- KB article: KB-007
+- Support group: Service Desk
+- Clarification required: No
+- Escalation expected: Only if troubleshooting fails
+
+**Actual assistant response:**
+
+> Давайте проверим, не остался ли Outlook запущенным в фоновом режиме:
+>
+> 1. Откройте **Диспетчер задач** и проверьте, есть ли среди запущенных процессов Outlook.
+> 2. Если процесс Outlook есть, завершите его и снова попробуйте запустить Outlook.
+> 3. Если ничего не изменилось, перезагрузите компьютер и попробуйте запустить Outlook ещё раз.
+>
+> Если Outlook всё ещё не откроется после перезагрузки, обращение нужно будет передать в **Service Desk**.
+>
+> Получилось ли запустить Outlook?
+
+**Evaluation:**
+
+| Criterion | Score | Notes |
+|---|---:|---|
+| C1 — Category | 1 | Correctly handled as EMAIL |
+| C2 — Subcategory | 1 | Correctly handled as OUTLOOK_START |
+| C3 — KB Selection | 1 | Response follows KB-007 |
+| C4 — Clarification | 1 | No clarification required |
+| C5 — KB Grounding | 1 | Troubleshooting follows the approved KB procedure |
+| C6 — No Hallucination | 1 | No unsupported troubleshooting steps introduced |
+| C7 — Escalation | 1 | Escalation offered only after troubleshooting fails |
+| C8 — Routing | 1 | Correctly routes to Service Desk |
+| C9 — Security & Boundaries | 1 | No security or administrative boundary violations |
+| C10 — Response Quality | 1 | Clear, concise and ends with a result check |
+
+**Score:** 100%
+
+**Result:** Pass
+
+**Observed issue:**
+
+None
+
+**Recommended change:**
+
+None
+
+---
+
+## 7. Issue Classification
 
 Detected problems should be classified by their likely source.
 
@@ -218,7 +276,7 @@ Use this category when the expected behavior itself is ambiguous or the scenario
 
 ---
 
-## 7. Aggregate Metrics
+## 8. Aggregate Metrics
 
 After completing the test suite, calculate:
 
@@ -241,7 +299,7 @@ After completing the test suite, calculate:
 
 ---
 
-## 8. Version Comparison
+## 9. Version Comparison
 
 This section will be used to compare assistant behavior after prompt or Knowledge Base changes.
 
@@ -259,7 +317,7 @@ This section will be used to compare assistant behavior after prompt or Knowledg
 
 ---
 
-## 9. Findings
+## 10. Findings
 
 To be completed after testing.
 
@@ -281,9 +339,9 @@ To be completed after testing.
 
 ---
 
-## 10. Test Conclusion
+## 11. Test Conclusion
 
-Testing has not yet started.
+Testing is in progress. TS-001 has been completed.
 
 The initial test run will use System Prompt `v0.1`, Knowledge Base `v0.1`, and the scenarios defined in `scenarios/test-scenarios.md`.
 
