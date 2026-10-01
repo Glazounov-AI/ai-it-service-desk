@@ -54,7 +54,7 @@ The CSV and Markdown versions should describe the same logical data.
 
 ## 3. Current Knowledge Base Coverage
 
-The current Knowledge Base contains 15 troubleshooting articles.
+The current Knowledge Base contains 16 troubleshooting articles.
 
 The covered areas include:
 
@@ -361,7 +361,7 @@ CSV- и Markdown-версии должны описывать одни и те �
 
 ## 3. Текущее покрытие Knowledge Base
 
-Текущая Knowledge Base содержит 15 статей диагностики.
+Текущая Knowledge Base содержит 16 статей диагностики.
 
 Она охватывает:
 

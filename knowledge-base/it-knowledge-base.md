@@ -1,17 +1,17 @@
 # AI IT Service Desk — Knowledge Base
 
-**Version:** 0.1  
-**Purpose:** Internal IT support Knowledge Base  
+**Version:** 0.2
+**Purpose:** Internal IT support Knowledge Base
 **Supported environment:** Windows 10, Windows 11, Microsoft 365, corporate network and services
 
 ---
 
 ## KB-001 — Change Corporate Account Password
 
-**Category:** `ACCESS`  
-**Subcategory:** `PASSWORD`  
-**Environment:** Corporate Account  
-**OS:** `ALL`  
+**Category:** `ACCESS`
+**Subcategory:** `PASSWORD`
+**Environment:** Corporate Account
+**OS:** `ALL`
 **Support Group:** `Identity & Access`
 
 ### Symptoms
@@ -38,10 +38,10 @@ Escalate to `Identity & Access` if the password cannot be changed or the user do
 
 ## KB-002 — Account Locked
 
-**Category:** `ACCESS`  
-**Subcategory:** `ACCOUNT_LOCKED`  
-**Environment:** Corporate Account  
-**OS:** `ALL`  
+**Category:** `ACCESS`
+**Subcategory:** `ACCOUNT_LOCKED`
+**Environment:** Corporate Account
+**OS:** `ALL`
 **Support Group:** `Identity & Access`
 
 ### Symptoms
@@ -66,10 +66,10 @@ Escalate to `Identity & Access`. Administrative account unlocking is required.
 
 ## KB-003 — Corporate Account Login Failure
 
-**Category:** `ACCESS`  
-**Subcategory:** `LOGIN_FAILED`  
-**Environment:** Corporate Account  
-**OS:** `ALL`  
+**Category:** `ACCESS`
+**Subcategory:** `LOGIN_FAILED`
+**Environment:** Corporate Account
+**OS:** `ALL`
 **Support Group:** `Identity & Access`
 
 ### Symptoms
@@ -436,6 +436,41 @@ The LAN connection is restored.
 ### Escalation Condition
 
 Escalate to `Network` if the physical connection has been checked but the LAN remains unavailable.
+
+---
+
+## KB-016 — Computer Does Not Power On or Boot
+
+**Category:** `HARDWARE`
+**Subcategory:** `PC_START`
+**Environment:** `Managed Windows Workstation`
+**OS Version:** `WIN10|WIN11`
+**Support Group:** `Workplace`
+
+### Symptoms
+
+The computer does not power on or does not begin the normal boot process.
+
+### User Actions
+
+1. Check that the computer is connected to power.
+2. If an external power adapter or power cable is used, check that it is securely connected to both the computer and the power source.
+3. If the computer is connected through a power strip or docking station, check that the device providing power is switched on and connected.
+4. Disconnect and reconnect the external power connection.
+5. Attempt to power on the computer again.
+6. Record any visible error message or unusual indicator shown during the startup attempt.
+
+### Expected Result
+
+The computer powers on and begins the normal boot process.
+
+### Escalation Condition
+
+The computer still does not power on or begin the normal boot process after the external power and connection checks.
+
+Do not open the computer case, change BIOS settings, or attempt hardware repair.
+
+Escalate the request to `Workplace`.
 
 ---
 
