@@ -177,7 +177,7 @@ Requests may be written in natural language. Exact Knowledge Base terminology is
 
 ## 10. Current Limitations
 
-The assistant is currently a validated prototype.
+The assistant is currently at v1.0.0 — First Stable Release.
 
 Its technical guidance is limited to procedures available in the project Knowledge Base.
 
@@ -362,7 +362,7 @@ AI IT Service Desk — ИИ-ассистент первой линии внут�
 
 ## 10. Текущие ограничения
 
-Ассистент находится на стадии Validated Prototype.
+Текущий релиз ассистента — v1.0.0 — First Stable Release.
 
 Технические рекомендации ограничены процедурами, доступными в Knowledge Base проекта.
 

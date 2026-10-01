@@ -327,9 +327,9 @@ The current project does not create tickets in an external Service Desk system. 
 
 ## 13. Project Scope
 
-### Current Scope — Validated Prototype
+### Current Scope — v1.0.0 First Stable Release
 
-The current prototype includes:
+The current release includes:
 
 - System Prompt 0.2;
 - IT request classification;
@@ -338,17 +338,11 @@ The current prototype includes:
 - clarification logic for ambiguous requests;
 - escalation rules;
 - security and administrative-action boundaries;
-- 20-scenario baseline functional test suite;
+- 22-scenario functional test suite, including the 20-scenario baseline and 2 pre-v1.0 regression scenarios;
 - documented prompt regression testing;
 - structured ticket draft generation for escalated requests;
-- Knowledge Base maintenance documentation.
-
-### First Stable Release — v1.0
-
-The first stable release is planned to include:
-
+- Knowledge Base maintenance documentation;
 - hardened and synchronized project documentation;
-- expanded regression coverage;
 - reviewed Knowledge Base coverage;
 - stable assistant behavior across the defined core scenarios;
 - portfolio-ready project presentation.
@@ -702,9 +696,9 @@ Knowledge Base является основным источником проце
 
 ## 13. Объём проекта
 
-### Текущий объём — Validated Prototype
+### Текущий объём — v1.0.0 First Stable Release
 
-Текущий прототип включает:
+Текущий релиз включает:
 
 - System Prompt 0.2;
 - классификацию IT-запросов;
@@ -713,20 +707,14 @@ Knowledge Base является основным источником проце
 - логику уточнения неоднозначных запросов;
 - правила эскалации;
 - ограничения безопасности и административных действий;
-- базовый набор из 20 функциональных тестовых сценариев;
+- набор из 22 функциональных тестовых сценариев, включая 20 базовых и 2 дополнительных регрессионных сценария перед v1.0;
 - документированное регрессионное тестирование промпта;
-- формирование структурированного черновика заявки для эскалированных обращений;
-- документацию по сопровождению Knowledge Base.
-
-### Первая стабильная версия — v1.0
-
-Для первой стабильной версии планируются:
-
-- актуализированная и согласованная документация проекта;
-- расширенное регрессионное покрытие;
-- проверка покрытия Knowledge Base;
+- формирование структурированного черновика заявки для эскалируемых обращений;
+- документацию по сопровождению Knowledge Base;
+- актуализированную и согласованную документацию проекта;
+- проверенное покрытие Knowledge Base;
 - стабильное поведение ассистента в определённых основных сценариях;
-- готовое профессиональное представление проекта.
+- готовое представление проекта для портфолио.
 
 ### Дальнейшее развитие
 

@@ -87,7 +87,7 @@ The assistant:
 - escalation when no approved resolution is available;
 - security and administrative-action boundaries;
 - documented System Prompt;
-- completed 20-scenario baseline functional test suite;
+- completed 22-scenario functional test suite, including the 20-scenario baseline and 2 pre-v1.0 regression scenarios;
 - structured ticket draft generation for escalated requests;
 - regression testing and documented investigation of observed limitations.
 
@@ -156,25 +156,27 @@ Project structure, architecture, initial request taxonomy and documentation fram
 
 Initial Knowledge Base, routing table, System Prompt and core troubleshooting scenarios.
 
-### Current Development — Validated Prototype
+### v1.0.0 — First Stable Release
 
-Full 20-scenario functional validation, prompt regression testing, documented limitations, and documentation hardening.
+The first stable release includes:
 
-### v1.0 — First Stable Release
-
-Stable documented assistant baseline with validated core behavior, expanded regression coverage, consistent project documentation, and portfolio-ready presentation.
+- hardened and synchronized project documentation;
+- expanded regression coverage;
+- reviewed Knowledge Base coverage;
+- stable assistant behavior across the defined core scenarios;
+- portfolio-ready project presentation.
 
 ### Future Development
 
-Knowledge Base expansion, advanced diagnostic scenarios, structured ticket generation, integration testing, and Service Desk API integration.
+Knowledge Base expansion, advanced diagnostic scenarios, integration testing, and Service Desk API integration.
 
 ## Current Status
 
-**Current development stage: Validated Prototype**
+**Current release: v1.0.0 — First Stable Release**
 
-Core assistant components are implemented and the baseline 20-scenario functional test suite has been completed. All scenarios passed functionally. System Prompt 0.2 is the current prompt version.
+Core assistant components are implemented. The 20-scenario baseline functional test suite and 2 pre-v1.0 regression scenarios have been completed, for a total of 22 executed scenarios. All scenarios passed functionally. System Prompt 0.2 is the current prompt version.
 
-The project is now focused on documentation hardening, broader regression coverage, Knowledge Base expansion, and preparation for the first stable release.
+The project has reached its first stable release after documentation hardening, expanded regression coverage, Knowledge Base review, and validation of the defined core scenarios.
 
 ---
 
@@ -259,7 +261,7 @@ AI IT Service Desk — ИИ-ассистент первой линии внут�
 - эскалация при отсутствии утверждённого решения;
 - соблюдение ограничений безопасности и административных действий;
 - документированный System Prompt;
-- выполненный базовый набор из 20 функциональных тестовых сценариев;
+- выполненный набор из 22 функциональных тестовых сценариев, включая 20 базовых и 2 дополнительных регрессионных сценария перед v1.0;
 - формирование структурированного черновика заявки для эскалируемых обращений;
 - регрессионное тестирование и документирование выявленных ограничений.
 
@@ -328,22 +330,24 @@ ai-it-service-desk/
 
 Первая версия Knowledge Base, таблица маршрутизации, System Prompt и основные диагностические сценарии.
 
-### Текущая разработка — Validated Prototype
+### v1.0.0 — First Stable Release
 
-Полная функциональная проверка по 20 сценариям, регрессионное тестирование промпта, документирование выявленных ограничений и актуализация документации.
+Первая стабильная версия включает:
 
-### v1.0 — First Stable Release
-
-Стабильная документированная версия ассистента с проверенным базовым поведением, расширенным регрессионным покрытием, согласованной документацией и готовым представлением проекта.
+- актуализированную и согласованную документацию проекта;
+- расширенное регрессионное покрытие;
+- проверенное покрытие Knowledge Base;
+- стабильное поведение ассистента в определённых основных сценариях;
+- готовое представление проекта для портфолио.
 
 ### Дальнейшее развитие
 
-Расширение Knowledge Base, сложные диагностические сценарии, генерация структурированных заявок, интеграционное тестирование и интеграция с Service Desk API.
+Расширение Knowledge Base, сложные диагностические сценарии, интеграционное тестирование и интеграция с Service Desk API.
 
 ## Текущий статус
 
-**Текущий этап разработки: Validated Prototype**
+**Текущий релиз: v1.0.0 — First Stable Release**
 
-Основные компоненты ассистента реализованы, базовый набор из 20 функциональных тестовых сценариев полностью выполнен. Все сценарии пройдены функционально. Текущая версия System Prompt — 0.2.
+Основные компоненты ассистента реализованы. Выполнены базовый набор из 20 функциональных тестовых сценариев и 2 дополнительных регрессионных сценария перед v1.0 — всего 22 сценария. Все сценарии пройдены функционально. Текущая версия System Prompt — 0.2.
 
-Следующий этап проекта — актуализация документации, расширение регрессионного покрытия и Knowledge Base, а также подготовка первой стабильной версии.
+Проект достиг первой стабильной версии после актуализации документации, расширения регрессионного покрытия, проверки покрытия Knowledge Base и валидации основных сценариев работы.
