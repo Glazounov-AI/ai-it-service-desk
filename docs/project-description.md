@@ -12,7 +12,7 @@
 
 The assistant helps employees resolve common technical issues using an approved Knowledge Base. It identifies the request category, asks clarifying questions when required, selects the relevant troubleshooting procedure, guides the user through the steps, checks the result, and escalates unresolved issues to the appropriate IT support group.
 
-The project is developed as part of a Prompt Engineering course and is designed to evolve from a course MVP into a portfolio-ready prototype.
+The project is developed as a professional prototype of an AI-powered IT Service Desk, with a focus on Knowledge Base-grounded troubleshooting, controlled escalation, security boundaries, and measurable assistant quality.
 
 ---
 
@@ -299,7 +299,7 @@ The assistant should avoid sending the employee back through troubleshooting ste
 
 ## 12. Ticket Draft
 
-For unresolved requests, the Portfolio Edition will generate a structured ticket draft.
+Structured ticket draft generation is planned as a future capability for unresolved requests.
 
 Example:
 
@@ -325,33 +325,41 @@ The structured output is designed as an extension point for future API or workfl
 
 ## 13. Project Scope
 
-### Course MVP — v1.0
+### Current Scope — Validated Prototype
 
-The Course MVP will include:
+The current prototype includes:
 
-- system prompt;
-- request classification;
-- Knowledge Base;
+- System Prompt 0.2;
+- IT request classification;
+- Knowledge Base-grounded troubleshooting;
 - routing table;
-- troubleshooting procedures;
-- clarification logic;
+- clarification logic for ambiguous requests;
 - escalation rules;
-- example dialogues;
-- test scenarios;
+- security and administrative-action boundaries;
+- 20-scenario baseline functional test suite;
+- documented prompt regression testing;
 - Knowledge Base maintenance documentation.
 
-### Portfolio Edition — v1.1
+### First Stable Release — v1.0
 
-The Portfolio Edition will extend the MVP with:
+The first stable release is planned to include:
+
+- hardened and synchronized project documentation;
+- expanded regression coverage;
+- reviewed Knowledge Base coverage;
+- stable assistant behavior across the defined core scenarios;
+- portfolio-ready project presentation.
+
+### Future Development
+
+Further development may include:
 
 - hierarchical request taxonomy;
-- larger Knowledge Base;
+- expanded Knowledge Base;
 - more complex multi-step troubleshooting;
-- structured ticket generation;
-- difficult and ambiguous test scenarios;
-- evaluation dataset;
-- quality metrics;
-- documented integration architecture.
+- structured ticket draft generation;
+- integration-level testing;
+- Service Desk API integration.
 
 ---
 
@@ -380,7 +388,7 @@ These capabilities may be represented conceptually but are not implemented in th
 
 Ассистент помогает сотрудникам решать типовые технические проблемы с использованием утверждённой базы знаний (Knowledge Base). Он определяет категорию запроса, при необходимости задаёт уточняющие вопросы, выбирает подходящую инструкцию, проводит пользователя через этапы диагностики, проверяет результат и передаёт нерешённую проблему соответствующей группе IT-поддержки.
 
-Проект разрабатывается в рамках курса по промпт-инжинирингу и развивается от учебного MVP до портфельного прототипа.
+Проект разрабатывается как профессиональный прототип AI IT Service Desk с акцентом на диагностику на основе Knowledge Base, контролируемую эскалацию, соблюдение границ безопасности и измеримую оценку качества ассистента.
 
 ---
 
@@ -664,7 +672,7 @@ Knowledge Base является основным источником проце
 
 ## 12. Черновик заявки
 
-Для нерешённых обращений Portfolio Edition будет формировать структурированный черновик заявки.
+Формирование структурированного черновика заявки для нерешённых обращений запланировано как дальнейшее развитие проекта.
 
 Пример:
 
@@ -690,33 +698,41 @@ Knowledge Base является основным источником проце
 
 ## 13. Объём проекта
 
-### Course MVP — v1.0
+### Текущий объём — Validated Prototype
 
-Учебная версия включает:
+Текущий прототип включает:
 
-- системный промпт;
-- классификацию запросов;
-- Knowledge Base;
+- System Prompt 0.2;
+- классификацию IT-запросов;
+- диагностику на основе Knowledge Base;
 - таблицу маршрутизации;
-- процедуры диагностики;
-- логику уточняющих вопросов;
+- логику уточнения неоднозначных запросов;
 - правила эскалации;
-- примеры диалогов;
-- тестовые сценарии;
-- инструкцию по сопровождению Knowledge Base.
+- ограничения безопасности и административных действий;
+- базовый набор из 20 функциональных тестовых сценариев;
+- документированное регрессионное тестирование промпта;
+- документацию по сопровождению Knowledge Base.
 
-### Portfolio Edition — v1.1
+### Первая стабильная версия — v1.0
 
-Портфельная версия дополнительно включает:
+Для первой стабильной версии планируются:
 
-- иерархическую классификацию;
-- расширенную Knowledge Base;
+- актуализированная и согласованная документация проекта;
+- расширенное регрессионное покрытие;
+- проверка покрытия Knowledge Base;
+- стабильное поведение ассистента в определённых основных сценариях;
+- готовое профессиональное представление проекта.
+
+### Дальнейшее развитие
+
+В дальнейшем могут быть добавлены:
+
+- иерархическая классификация запросов;
+- расширенная Knowledge Base;
 - более сложные многошаговые сценарии диагностики;
-- структурированную генерацию заявок;
-- сложные и неоднозначные тестовые сценарии;
-- evaluation dataset;
-- метрики качества;
-- описание архитектуры будущей интеграции.
+- генерация структурированного черновика заявки;
+- интеграционное тестирование;
+- интеграция с Service Desk API.
 
 ---
 

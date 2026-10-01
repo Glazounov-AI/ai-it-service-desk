@@ -1,5 +1,21 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Full 20-scenario functional test suite
+- Prompt regression testing and citation behavior investigation
+- Documented baseline evaluation results
+
+### Changed
+
+- System Prompt updated to version 0.2
+- Project positioning changed from course-oriented MVP to professional AI IT Service Desk prototype
+- Development roadmap revised toward the first stable release
+- Project development stage updated to Validated Prototype
+- README and project description synchronized with the current project state
+
 ## [0.5.0] - 2026-09-29
 
 ### Added

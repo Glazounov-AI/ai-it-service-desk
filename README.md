@@ -14,7 +14,7 @@ AI IT Service Desk is an AI-powered assistant designed to automate common first-
 
 The assistant identifies the type of issue, asks clarifying questions when necessary, retrieves relevant instructions from the Knowledge Base, guides the employee through troubleshooting, and escalates unresolved issues to the appropriate IT team.
 
-The project is being developed as part of a Prompt Engineering course and is designed to evolve from a course MVP into a portfolio-ready prototype of an AI-powered IT Service Desk.
+The project is designed as a professional prototype of an AI-powered IT Service Desk, with a focus on Knowledge Base-grounded troubleshooting, controlled escalation, security boundaries, and measurable assistant quality.
 
 ## Project Goals
 
@@ -77,30 +77,28 @@ The assistant:
 - escalates an issue when it cannot be safely resolved using the available Knowledge Base;
 - clearly distinguishes troubleshooting instructions from actions that require an IT specialist.
 
-## Planned Capabilities
-
-### Course MVP — v1.0
+## Current Capabilities
 
 - IT request classification;
-- Knowledge Base lookup;
-- step-by-step troubleshooting;
-- clarifying questions;
-- routing by issue category;
-- escalation rules;
-- example dialogues;
-- Knowledge Base maintenance instructions;
-- documented system prompt.
+- Knowledge Base-grounded troubleshooting;
+- clarification of ambiguous requests;
+- step-by-step troubleshooting procedures;
+- support-group routing;
+- escalation when no approved resolution is available;
+- security and administrative-action boundaries;
+- documented System Prompt;
+- completed 20-scenario baseline functional test suite;
+- regression testing and documented investigation of observed limitations.
 
-### Portfolio Edition — v1.1
+## Planned Enhancements
 
 - hierarchical request classification;
-- extended Knowledge Base;
-- multi-step diagnostic scenarios;
-- structured escalation;
-- ticket draft generation;
-- difficult and ambiguous test cases;
-- evaluation dataset;
-- quality metrics.
+- expanded Knowledge Base coverage;
+- more complex multi-step diagnostic scenarios;
+- structured ticket draft generation;
+- broader regression dataset;
+- integration-level testing outside the Playground environment;
+- Service Desk API integration.
 
 ## Planned Ticket Output
 
@@ -156,21 +154,27 @@ Project structure, architecture, initial request taxonomy and documentation fram
 
 ### v0.5 — Working Prototype
 
-Initial Knowledge Base, routing table, system prompt and core troubleshooting scenarios.
+Initial Knowledge Base, routing table, System Prompt and core troubleshooting scenarios.
 
-### v1.0 — Course MVP
+### Current Development — Validated Prototype
 
-Complete implementation of the course requirements.
+Full 20-scenario functional validation, prompt regression testing, documented limitations, and documentation hardening.
 
-### v1.1 — Portfolio Edition
+### v1.0 — First Stable Release
 
-Extended Knowledge Base, advanced troubleshooting logic, structured escalation, ticket generation and evaluation.
+Stable documented assistant baseline with validated core behavior, expanded regression coverage, consistent project documentation, and portfolio-ready presentation.
+
+### Future Development
+
+Knowledge Base expansion, advanced diagnostic scenarios, structured ticket generation, integration testing, and Service Desk API integration.
 
 ## Current Status
 
-**Current version: v0.5 — Working Prototype**
+**Current development stage: Validated Prototype**
 
-Core assistant components are implemented. Initial testing is in progress.
+Core assistant components are implemented and the baseline 20-scenario functional test suite has been completed. All scenarios passed functionally. System Prompt 0.2 is the current prompt version.
+
+The project is now focused on documentation hardening, broader regression coverage, Knowledge Base expansion, and preparation for the first stable release.
 
 ---
 
@@ -182,7 +186,7 @@ AI IT Service Desk — ИИ-ассистент первой линии внут�
 
 Ассистент определяет тип проблемы, при необходимости задаёт уточняющие вопросы, находит подходящую инструкцию в базе знаний (Knowledge Base), проводит сотрудника через пошаговую диагностику и передаёт нерешённую проблему соответствующей группе IT-поддержки.
 
-Проект разрабатывается в рамках курса по промпт-инжинирингу и развивается от учебного MVP до портфельного прототипа AI IT Service Desk.
+Проект разрабатывается как профессиональный прототип AI IT Service Desk с акцентом на диагностику на основе Knowledge Base, контролируемую эскалацию, соблюдение границ безопасности и измеримую оценку качества ассистента.
 
 ## Цели проекта
 
@@ -245,30 +249,28 @@ AI IT Service Desk — ИИ-ассистент первой линии внут�
 - эскалирует проблему, если её нельзя безопасно решить с помощью доступной Knowledge Base;
 - отделяет инструкции, которые пользователь может выполнить самостоятельно, от действий, требующих IT-специалиста.
 
-## Планируемые возможности
-
-### Course MVP — v1.0
+## Текущие возможности
 
 - классификация IT-запросов;
-- поиск решения в Knowledge Base;
-- пошаговая диагностика;
-- уточняющие вопросы;
-- маршрутизация по категории проблемы;
-- правила эскалации;
-- примеры диалогов;
-- инструкция по обновлению Knowledge Base;
-- документированный системный промпт.
+- диагностика на основе Knowledge Base;
+- уточнение неоднозначных запросов;
+- пошаговые процедуры диагностики;
+- маршрутизация по группам поддержки;
+- эскалация при отсутствии утверждённого решения;
+- соблюдение ограничений безопасности и административных действий;
+- документированный System Prompt;
+- выполненный базовый набор из 20 функциональных тестовых сценариев;
+- регрессионное тестирование и документирование выявленных ограничений.
 
-### Portfolio Edition — v1.1
+## Планируемое развитие
 
 - иерархическая классификация запросов;
-- расширенная Knowledge Base;
-- многошаговые диагностические сценарии;
-- структурированная эскалация;
-- генерация черновика заявки;
-- сложные и неоднозначные тестовые сценарии;
-- evaluation dataset;
-- метрики качества.
+- расширение Knowledge Base;
+- более сложные многошаговые диагностические сценарии;
+- генерация структурированного черновика заявки;
+- расширение набора регрессионных тестов;
+- интеграционное тестирование вне среды Playground;
+- интеграция с Service Desk API.
 
 ## Формирование заявки
 
@@ -324,18 +326,24 @@ ai-it-service-desk/
 
 ### v0.5 — Working Prototype
 
-Первая версия Knowledge Base, таблица маршрутизации, системный промпт и основные диагностические сценарии.
+Первая версия Knowledge Base, таблица маршрутизации, System Prompt и основные диагностические сценарии.
 
-### v1.0 — Course MVP
+### Текущая разработка — Validated Prototype
 
-Полная реализация требований учебного технического задания.
+Полная функциональная проверка по 20 сценариям, регрессионное тестирование промпта, документирование выявленных ограничений и актуализация документации.
 
-### v1.1 — Portfolio Edition
+### v1.0 — First Stable Release
 
-Расширенная Knowledge Base, развитая логика диагностики, структурированная эскалация, генерация заявок и оценка качества.
+Стабильная документированная версия ассистента с проверенным базовым поведением, расширенным регрессионным покрытием, согласованной документацией и готовым представлением проекта.
+
+### Дальнейшее развитие
+
+Расширение Knowledge Base, сложные диагностические сценарии, генерация структурированных заявок, интеграционное тестирование и интеграция с Service Desk API.
 
 ## Текущий статус
 
-**Текущая версия: v0.5 — Working Prototype**
+**Текущий этап разработки: Validated Prototype**
 
-Основные компоненты ассистента реализованы. Начинается первичное тестирование.
+Основные компоненты ассистента реализованы, базовый набор из 20 функциональных тестовых сценариев полностью выполнен. Все сценарии пройдены функционально. Текущая версия System Prompt — 0.2.
+
+Следующий этап проекта — актуализация документации, расширение регрессионного покрытия и Knowledge Base, а также подготовка первой стабильной версии.
