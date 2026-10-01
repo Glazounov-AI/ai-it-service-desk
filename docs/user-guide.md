@@ -185,7 +185,7 @@ Knowledge Base coverage is intentionally limited and does not represent every po
 
 The assistant does not currently integrate with a production Service Desk, identity-management platform, endpoint-management system, or other administrative infrastructure.
 
-Structured ticket draft generation and external Service Desk integration are planned for future development.
+For escalated requests, the assistant can prepare a structured ticket draft, but it does not create a real ticket in an external Service Desk system. External Service Desk integration is planned for future development.
 
 ---
 
@@ -370,4 +370,4 @@ AI IT Service Desk — ИИ-ассистент первой линии внут�
 
 Ассистент пока не интегрирован с реальной системой Service Desk, системой управления учётными записями, средствами управления рабочими станциями или другой административной инфраструктурой.
 
-Формирование структурированного черновика заявки и интеграция с внешней системой Service Desk запланированы как дальнейшее развитие проекта.
+Для эскалируемых обращений ассистент может сформировать структурированный черновик заявки, но не создаёт реальную заявку во внешней системе Service Desk. Интеграция с внешней системой Service Desk запланирована как дальнейшее развитие проекта.

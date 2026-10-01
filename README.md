@@ -88,6 +88,7 @@ The assistant:
 - security and administrative-action boundaries;
 - documented System Prompt;
 - completed 20-scenario baseline functional test suite;
+- structured ticket draft generation for escalated requests;
 - regression testing and documented investigation of observed limitations.
 
 ## Planned Enhancements
@@ -95,7 +96,6 @@ The assistant:
 - hierarchical request classification;
 - expanded Knowledge Base coverage;
 - more complex multi-step diagnostic scenarios;
-- structured ticket draft generation;
 - broader regression dataset;
 - integration-level testing outside the Playground environment;
 - Service Desk API integration.
@@ -108,12 +108,12 @@ Example:
 
 ```json
 {
-  "category": "ACCESS",
-  "subcategory": "MFA",
+  "category": "VPN",
+  "subcategory": "RESOURCE_ACCESS",
   "priority": "normal",
-  "assigned_group": "Identity & Access",
-  "issue_summary": "MFA unavailable after phone replacement",
-  "kb_article": "KB-017",
+  "assigned_group": "Network",
+  "issue_summary": "Corporate resources remain unavailable through an active VPN connection",
+  "kb_article": "KB-011",
   "troubleshooting_completed": true,
   "resolution": "not_resolved",
   "action": "escalate"
@@ -260,6 +260,7 @@ AI IT Service Desk — ИИ-ассистент первой линии внут�
 - соблюдение ограничений безопасности и административных действий;
 - документированный System Prompt;
 - выполненный базовый набор из 20 функциональных тестовых сценариев;
+- формирование структурированного черновика заявки для эскалируемых обращений;
 - регрессионное тестирование и документирование выявленных ограничений.
 
 ## Планируемое развитие
@@ -267,7 +268,6 @@ AI IT Service Desk — ИИ-ассистент первой линии внут�
 - иерархическая классификация запросов;
 - расширение Knowledge Base;
 - более сложные многошаговые диагностические сценарии;
-- генерация структурированного черновика заявки;
 - расширение набора регрессионных тестов;
 - интеграционное тестирование вне среды Playground;
 - интеграция с Service Desk API.
@@ -280,12 +280,12 @@ AI IT Service Desk — ИИ-ассистент первой линии внут�
 
 ```json
 {
-  "category": "ACCESS",
-  "subcategory": "MFA",
+  "category": "VPN",
+  "subcategory": "RESOURCE_ACCESS",
   "priority": "normal",
-  "assigned_group": "Identity & Access",
-  "issue_summary": "MFA unavailable after phone replacement",
-  "kb_article": "KB-017",
+  "assigned_group": "Network",
+  "issue_summary": "Корпоративные ресурсы остаются недоступными при активном VPN-соединении",
+  "kb_article": "KB-011",
   "troubleshooting_completed": true,
   "resolution": "not_resolved",
   "action": "escalate"

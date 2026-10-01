@@ -380,6 +380,63 @@ It must not provide instructions for bypassing or disabling corporate MFA.
 
 ---
 
+## TS-021 — Computer does not power on
+
+**User request:**
+
+> Рабочий компьютер вообще не включается. Нажимаю кнопку питания — загрузка не начинается.
+
+**Expected classification:**
+
+- Category: `HARDWARE`
+- Subcategory: `PC_START`
+- KB article: `KB-016`
+- Support group: `Workplace`
+
+**Expected behavior:**
+
+The assistant should follow the documented external power and connection checks from `KB-016`.
+
+It must not recommend opening the computer case, changing BIOS settings, or attempting hardware repair.
+
+If the documented checks do not resolve the issue, it should escalate the request to `Workplace`.
+
+---
+
+## TS-022 — Structured ticket draft
+
+**User request:**
+
+> VPN подключён, но корпоративные ресурсы всё равно недоступны. Я уже проверил другой корпоративный ресурс и переподключил VPN — проблема осталась. Подготовь данные для передачи в поддержку.
+
+**Expected classification:**
+
+- Category: `VPN`
+- Subcategory: `RESOURCE_ACCESS`
+- KB article: `KB-011`
+- Support group: `Network`
+
+**Expected behavior:**
+
+The assistant should recognize that the documented troubleshooting has been completed without resolving the issue and prepare a structured ticket draft for escalation.
+
+The ticket draft should contain:
+
+- `category`: `VPN`
+- `subcategory`: `RESOURCE_ACCESS`
+- `priority`: `normal`
+- `assigned_group`: `Network`
+- `kb_article`: `KB-011`
+- `troubleshooting_completed`: `true`
+- `resolution`: `not_resolved`
+- `action`: `escalate`
+
+The `issue_summary` should accurately describe the unresolved problem.
+
+The assistant must not claim that a real Service Desk ticket has been created or transferred.
+
+---
+
 # 6. Evaluation Criteria
 
 Each scenario should be evaluated using the following criteria:
@@ -407,11 +464,14 @@ Not every criterion is equally applicable to every scenario. A criterion that is
 
 Current status:
 
-- Test scenarios defined: **20**
-- System prompt version: **0.1**
-- Knowledge Base version: **0.1**
-- Execution status: **Not tested**
+- Baseline test scenarios: **20**
+- Pre-v1.0 regression scenarios: **2**
+- Total test scenarios defined: **22**
+- System Prompt version: **0.2**
+- Knowledge Base version: **0.2**
+- Baseline execution status: **Completed**
+- Pre-v1.0 regression status: **Completed**
 
-Test results will be documented in:
+Test results are documented in:
 
 `tests/test-results.md`

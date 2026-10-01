@@ -299,27 +299,29 @@ The assistant should avoid sending the employee back through troubleshooting ste
 
 ## 12. Ticket Draft
 
-Structured ticket draft generation is planned as a future capability for unresolved requests.
+For unresolved requests, the assistant can generate a structured ticket draft for escalation.
 
 Example:
 
 ```json
 {
-  "category": "MFA",
-  "subcategory": "PHONE_REPLACED",
+  "category": "VPN",
+  "subcategory": "RESOURCE_ACCESS",
   "priority": "normal",
-  "assigned_group": "Identity & Access",
-  "issue_summary": "MFA unavailable after phone replacement",
-  "kb_article": "KB-017",
+  "assigned_group": "Network",
+  "issue_summary": "Corporate resources remain unavailable through an active VPN connection",
+  "kb_article": "KB-011",
   "troubleshooting_completed": true,
   "resolution": "not_resolved",
   "action": "escalate"
 }
 ```
 
-The project does not currently create tickets in an external Service Desk system.
+If no Knowledge Base article was used, `kb_article` must be `null`.
 
-The structured output is designed as an extension point for future API or workflow automation.
+The structured output is an internal escalation summary only. It does not mean that a real Service Desk ticket has been created.
+
+The current project does not create tickets in an external Service Desk system. Integration with an external Service Desk or workflow through an API is planned for future development.
 
 ---
 
@@ -338,6 +340,7 @@ The current prototype includes:
 - security and administrative-action boundaries;
 - 20-scenario baseline functional test suite;
 - documented prompt regression testing;
+- structured ticket draft generation for escalated requests;
 - Knowledge Base maintenance documentation.
 
 ### First Stable Release — v1.0
@@ -357,7 +360,6 @@ Further development may include:
 - hierarchical request taxonomy;
 - expanded Knowledge Base;
 - more complex multi-step troubleshooting;
-- structured ticket draft generation;
 - integration-level testing;
 - Service Desk API integration.
 
@@ -672,27 +674,29 @@ Knowledge Base является основным источником проце
 
 ## 12. Черновик заявки
 
-Формирование структурированного черновика заявки для нерешённых обращений запланировано как дальнейшее развитие проекта.
+Для нерешённых обращений ассистент может сформировать структурированный черновик заявки для эскалации.
 
 Пример:
 
 ```json
 {
-  "category": "MFA",
-  "subcategory": "PHONE_REPLACED",
+  "category": "VPN",
+  "subcategory": "RESOURCE_ACCESS",
   "priority": "normal",
-  "assigned_group": "Identity & Access",
-  "issue_summary": "MFA unavailable after phone replacement",
-  "kb_article": "KB-017",
+  "assigned_group": "Network",
+  "issue_summary": "Корпоративные ресурсы остаются недоступными при активном VPN-соединении",
+  "kb_article": "KB-011",
   "troubleshooting_completed": true,
   "resolution": "not_resolved",
   "action": "escalate"
 }
 ```
 
-На текущем этапе проект не создаёт реальную заявку во внешней Service Desk-системе.
+Если статья Knowledge Base не использовалась, значение `kb_article` должно быть `null`.
 
-Структурированный результат проектируется как точка для будущей интеграции через API или систему автоматизации.
+Структурированный вывод представляет собой только внутреннюю сводку для эскалации. Он не означает, что реальный тикет в Service Desk был создан.
+
+В текущей версии проекта тикеты во внешней системе Service Desk не создаются. Интеграция с внешней системой Service Desk или рабочим процессом через API запланирована для будущего развития проекта.
 
 ---
 
@@ -711,6 +715,7 @@ Knowledge Base является основным источником проце
 - ограничения безопасности и административных действий;
 - базовый набор из 20 функциональных тестовых сценариев;
 - документированное регрессионное тестирование промпта;
+- формирование структурированного черновика заявки для эскалированных обращений;
 - документацию по сопровождению Knowledge Base.
 
 ### Первая стабильная версия — v1.0
@@ -730,7 +735,6 @@ Knowledge Base является основным источником проце
 - иерархическая классификация запросов;
 - расширенная Knowledge Base;
 - более сложные многошаговые сценарии диагностики;
-- генерация структурированного черновика заявки;
 - интеграционное тестирование;
 - интеграция с Service Desk API.
 
