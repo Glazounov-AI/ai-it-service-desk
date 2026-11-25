@@ -6,6 +6,11 @@ from service_desk.api import create_app
 from service_desk.config import Settings
 
 
+@pytest.fixture(autouse=True)
+def isolated_db(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+
 def make_client(handler):
     return TestClient(create_app(Settings(rag_api_key='test-key'), httpx.MockTransport(handler)))
 
