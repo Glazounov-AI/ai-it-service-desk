@@ -1,0 +1,2 @@
+# F2 integration
+RAG Assistant is a separate dependency. Set RAG_PROFILES_DIR to this repository's profiles directory. Generate documents with python scripts/generate_kb.py. Russian CSV is the source for generated documents; existing English Markdown is preserved and not asserted equivalent. The original prompt is retained for initial integration. F3 adds dialogue state, routing validation, ticket drafts and prompt adaptation. No public deployment before security and functional tests.

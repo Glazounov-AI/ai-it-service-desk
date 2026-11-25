@@ -1,0 +1,14 @@
+{
+  "mode": "it_service_desk",
+  "collection": "it_service_desk_kb",
+  "data_dir": "../knowledge-base/documents",
+  "prompt_file": "../prompts/system-prompt.md",
+  "model": "gpt-4o-mini",
+  "temperature": 0.2,
+  "max_tokens": 800,
+  "top_k": 5,
+  "max_query_length": 2000,
+  "rate_limit_per_minute": 5,
+  "cache_enabled": false,
+  "log_content": false
+}
