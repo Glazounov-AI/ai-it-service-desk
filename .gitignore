@@ -5,3 +5,8 @@
 Thumbs.db
 .vscode/
 .idea/
+.venv/
+__pycache__/
+.pytest_cache/
+data/
+!.env.example
