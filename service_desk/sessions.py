@@ -3,9 +3,10 @@ from .storage import SessionError
 
 
 class SessionService:
-    def __init__(self, repository, rag):
+    def __init__(self, repository, rag, consultation=None):
         self.repository = repository
         self.rag = rag
+        self.consultation = consultation
         self.active = set()
 
     @contextmanager
@@ -20,8 +21,11 @@ class SessionService:
 
     async def consult(self, sid, query):
         with self.exclusive(sid):
-            self.repository.append(sid, 'user', query)
-            result = await self.rag.query(query)
+            if self.consultation is None:
+                raise RuntimeError('Consultation service required')
+            safe, classification = self.consultation.prepare(query)
+            self.repository.append(sid, 'user', safe.text, {'classification': classification.model_dump()})
+            result = await self.consultation.execute(safe, classification)
             self.repository.append(sid, 'assistant', result.answer,
                                    result.model_dump(exclude={'query', 'answer'}))
             return result

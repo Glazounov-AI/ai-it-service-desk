@@ -1,0 +1,176 @@
+{
+  "rules": [
+    {
+      "category": "EMAIL",
+      "subcategory": "OUTLOOK_START",
+      "pattern": "outlook.{0,40}не запуска|не запуска.{0,40}outlook"
+    },
+    {
+      "category": "VPN",
+      "subcategory": "CLIENT_START",
+      "pattern": "не запуска.{0,40}vpn|vpn.{0,40}не запуска"
+    },
+    {
+      "category": "VPN",
+      "subcategory": "RESOURCE_ACCESS",
+      "pattern": "vpn.{0,40}подключ[её]н.{0,80}(?:недоступ|не открыва)"
+    },
+    {
+      "category": "VPN",
+      "subcategory": "CONNECTION",
+      "pattern": "не подключается.{0,30}vpn|vpn.{0,30}(?:не подключается|не соединяется)"
+    },
+    {
+      "category": "VPN",
+      "subcategory": "AUTHENTICATION",
+      "pattern": "vpn.{0,40}(?:аутентификац|неверный пароль)"
+    },
+    {
+      "category": "HARDWARE",
+      "subcategory": "PRINTER",
+      "pattern": "принтер|не печатает"
+    },
+    {
+      "category": "HARDWARE",
+      "subcategory": "PC_START",
+      "pattern": "(?:компьютер|ноутбук|пк).{0,30}не (?:включается|загружается)"
+    },
+    {
+      "category": "NETWORK",
+      "subcategory": "WIFI",
+      "pattern": "wi[- ]?fi|вайфай"
+    },
+    {
+      "category": "NETWORK",
+      "subcategory": "LAN",
+      "pattern": "проводн.{0,20}сет|сетевой кабель|подключени\\w* по кабелю"
+    },
+    {
+      "category": "NETWORK",
+      "subcategory": "INTERNET",
+      "pattern": "нет (?:доступа в )?интернет"
+    },
+    {
+      "category": "ACCESS",
+      "subcategory": "ACCOUNT_LOCKED",
+      "pattern": "заблокирован.{0,30}(?:уч[её]тн|аккаунт)|уч[её]тная запись заблокирован"
+    },
+    {
+      "category": "ACCESS",
+      "subcategory": "PERMISSIONS",
+      "pattern": "прав[ао].{0,20}(?:администратор|доступ)|админские права"
+    },
+    {
+      "category": "ACCESS",
+      "subcategory": "PASSWORD",
+      "pattern": "забыл.{0,20}пароль|сброс.{0,20}парол"
+    },
+    {
+      "category": "MFA",
+      "subcategory": "PHONE_REPLACED",
+      "pattern": "(?:сменил|заменил|новый).{0,20}телефон|поменял\\w* телефон"
+    },
+    {
+      "category": "MFA",
+      "subcategory": "CODE_NOT_RECEIVED",
+      "pattern": "не приходит.{0,30}код|код.{0,30}не приходит"
+    },
+    {
+      "category": "MFA",
+      "subcategory": "AUTHENTICATOR",
+      "pattern": "аутентификатор|authenticator"
+    },
+    {
+      "category": "EMAIL",
+      "subcategory": "SEND_RECEIVE",
+      "pattern": "не (?:отправляются|приходят|принимаются).{0,30}(?:письма|сообщения)"
+    },
+    {
+      "category": "SOFTWARE",
+      "subcategory": "INSTALL_REQUEST",
+      "pattern": "(?:установить|установка).{0,40}(?:программ|приложен|по\\b)|нет в корпоративном каталоге.{0,50}установить"
+    },
+    {
+      "category": "ACCESS",
+      "subcategory": "LOGIN_FAILED",
+      "pattern": "не уда[её]тся войти.{0,30}уч[её]тн"
+    },
+    {
+      "category": "EMAIL",
+      "subcategory": "PROFILE",
+      "pattern": "профил\\w* outlook|outlook.{0,30}профил"
+    },
+    {
+      "category": "EMAIL",
+      "subcategory": "MAILBOX_ACCESS",
+      "pattern": "нет доступа к почтовому ящику"
+    },
+    {
+      "category": "SOFTWARE",
+      "subcategory": "APP_START",
+      "pattern": "корпоративное приложение не запускается"
+    },
+    {
+      "category": "SOFTWARE",
+      "subcategory": "APP_ERROR",
+      "pattern": "ошибка при работе приложения"
+    },
+    {
+      "category": "SOFTWARE",
+      "subcategory": "UPDATE",
+      "pattern": "не обновляется программное обеспечение"
+    },
+    {
+      "category": "HARDWARE",
+      "subcategory": "PERIPHERAL",
+      "pattern": "не работает (?:мышь|клавиатура|гарнитура)"
+    },
+    {
+      "category": "HARDWARE",
+      "subcategory": "DISPLAY",
+      "pattern": "нет изображения на мониторе"
+    },
+    {
+      "category": "NETWORK",
+      "subcategory": "SHARED_RESOURCE",
+      "pattern": "недоступен сетевой ресурс|адрес.{0,30}файлового сервера"
+    },
+    {
+      "category": "OTHER",
+      "subcategory": "UNKNOWN",
+      "pattern": "неизвестная it-проблема"
+    }
+  ],
+  "categories": {
+    "VPN": "vpn",
+    "EMAIL": "outlook|почт",
+    "MFA": "mfa|аутентификатор",
+    "NETWORK": "сеть|сетев|нет сети",
+    "ACCESS": "пароль|уч[её]тн",
+    "HARDWARE": "компьютер|ноутбук|bios",
+    "SOFTWARE": "программ|приложен"
+  },
+  "out_of_scope": "рецепт|погода|столица|стихотворение",
+  "clarifications": [
+    {
+      "pattern": "настройку windows",
+      "question": "Какую настройку нужно изменить и какая версия Windows: 10 или 11?"
+    },
+    {
+      "pattern": "ошибка\\s+\\d+",
+      "question": "В какой системе или приложении появляется ошибка?"
+    },
+    {
+      "pattern": "\\bvpn\\b",
+      "question": "VPN-клиент не запускается, не проходит вход, не подключается или недоступны ресурсы?"
+    },
+    {
+      "pattern": "outlook",
+      "question": "Outlook не запускается или есть проблема с отправкой и получением писем?"
+    },
+    {
+      "pattern": "нет сети|пропала сеть",
+      "question": "Какой тип подключения используется: LAN, Wi-Fi или VPN?"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+from .classification.models import Classification
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -18,6 +19,7 @@ class RagResponse(BaseModel):
     retrieved_sources: list[dict] = Field(default_factory=list)
     usage: dict = Field(default_factory=dict)
     strategy: str = 'semantic'
+    classification: Classification | None = None
 
 
 class SessionCreate(BaseModel):

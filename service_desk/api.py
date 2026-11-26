@@ -2,6 +2,10 @@ from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from .safety import SafetyFilter
+from .classification.classifier import Classifier
+from .consultation import ConsultationService
 from .storage import SQLiteRepository, SessionError
 from .sessions import SessionService
 from .config import Settings
@@ -16,10 +20,15 @@ def create_app(settings: Settings | None = None, transport=None):
         async with httpx.AsyncClient(timeout=config.rag_timeout, transport=transport,
                                      follow_redirects=False, trust_env=False) as client:
             app.state.rag = RagClient(client, config)
-            app.state.sessions = SessionService(SQLiteRepository(config.db_path), app.state.rag)
+            app.state.consultation = ConsultationService(app.state.rag, SafetyFilter(), Classifier())
+            app.state.sessions = SessionService(SQLiteRepository(config.db_path), app.state.rag, app.state.consultation)
             yield
 
     app = FastAPI(title='AI IT Service Desk — development API', version='1.1.0.dev3', lifespan=lifespan)
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(request, exc):
+        return JSONResponse(status_code=422, content={'detail': 'Invalid request'})
 
     @app.get('/health')
     async def health():
@@ -28,7 +37,8 @@ def create_app(settings: Settings | None = None, transport=None):
     @app.post('/consult', response_model=RagResponse)
     async def consult(body: ConsultationRequest, request: Request):
         try:
-            return await request.app.state.rag.query(body.query)
+            service = request.app.state.consultation
+            return await service.execute(*service.prepare(body.query))
         except RagError as exc:
             raise HTTPException(status_code=exc.status, detail=str(exc)) from None
 
@@ -38,6 +48,8 @@ def create_app(settings: Settings | None = None, transport=None):
 
     @app.post('/sessions', response_model=SessionResponse, status_code=201)
     async def create_session(body: SessionCreate, request: Request):
+        if request.app.state.consultation.safety.inspect(body.user_id).flags:
+            raise HTTPException(status_code=422, detail='Invalid user identifier')
         return request.app.state.sessions.repository.create(body.user_id)
 
     @app.get('/sessions/{session_id}', response_model=SessionResponse)
