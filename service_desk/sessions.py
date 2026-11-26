@@ -1,4 +1,7 @@
 import asyncio
+from .diagnostic_case import observe
+from .decision import DecisionEngine
+from .diagnostic_preflight import preflight
 from contextlib import contextmanager
 from .context import build_context
 from .rag_client import RagError
@@ -11,6 +14,7 @@ class SessionService:
         self.rag = rag
         self.consultation = consultation
         self.active = set()
+        self.engine = DecisionEngine() if rag is not None and rag.settings.managed_diagnostics else None
 
     @contextmanager
     def exclusive(self, sid):
@@ -28,10 +32,21 @@ class SessionService:
                 raise RuntimeError('Consultation service required')
             safe, classification = self.consultation.prepare(query)
             context = build_context(self.repository.recent_messages(sid), self.consultation.safety)
-            self.repository.append(sid, 'user', safe.text, {'classification': classification.model_dump()})
+            message_id = self.repository.append(sid, 'user', safe.text, {'classification': classification.model_dump()})
             try:
                 async with asyncio.timeout(28):
-                    classification = await self.consultation.classify(safe, classification, context)
+                    case = self.repository.get_case(sid)
+                    local = preflight(safe, classification, case, self.repository.get(sid)["status"]) if self.engine else None
+                    classification = local if local is not None else await self.consultation.classify(safe, classification, context)
+                    if self.engine:
+                        status = self.repository.get(sid)['status']
+                        updated, target, result = await self.engine.decide(case, message_id, safe, classification, status, self.rag)
+                        result = type(result).model_validate(self.consultation.safety.clean(result.model_dump()))
+                        self.repository.finish_diagnostic_turn(updated, status, target, result)
+                        return result
+                    updated = observe(case, message_id, safe.text, classification)
+                    if updated != case:
+                        self.repository.save_case(updated)
                     result = await self.consultation.execute(safe, classification)
             except TimeoutError:
                 raise RagError(504, 'Превышено общее время ожидания') from None

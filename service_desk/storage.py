@@ -1,3 +1,4 @@
+from .diagnostic_case import DiagnosticCase
 import sqlite3
 import json
 from contextlib import contextmanager
@@ -44,6 +45,10 @@ class SQLiteRepository:
                     role TEXT NOT NULL CHECK(role IN ('user','assistant')),
                     content TEXT NOT NULL, metadata_json TEXT NOT NULL,
                     created_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS diagnostic_cases (
+                    session_id TEXT PRIMARY KEY REFERENCES sessions(id),
+                    revision INTEGER NOT NULL, payload_json TEXT NOT NULL
                 );
                 CREATE INDEX IF NOT EXISTS messages_session ON messages(session_id,id);
             ''')
@@ -93,9 +98,10 @@ class SQLiteRepository:
             if session['status'] in {'closed', 'resolved', 'ticket_draft_ready'}:
                 raise SessionError(409, 'Сессия не принимает сообщения')
             stamp = now()
-            db.execute('INSERT INTO messages(session_id,role,content,metadata_json,created_at) VALUES (?,?,?,?,?)',
+            cursor = db.execute('INSERT INTO messages(session_id,role,content,metadata_json,created_at) VALUES (?,?,?,?,?)',
                        (sid,role,content,json.dumps(metadata or {},ensure_ascii=False),stamp))
             db.execute('UPDATE sessions SET updated_at=? WHERE id=?', (stamp,sid))
+            return cursor.lastrowid
 
     def messages(self, sid):
         with self.connection() as db:
@@ -113,3 +119,59 @@ class SQLiteRepository:
             self._get(db, sid)
             rows = db.execute('SELECT role,content FROM messages WHERE session_id=? ORDER BY id DESC LIMIT 6', (sid,)).fetchall()
             return [dict(row) for row in reversed(rows)]
+
+    def get_case(self, sid):
+        with self.connection() as db:
+            session = self._get(db, sid)
+            row = db.execute('SELECT payload_json FROM diagnostic_cases WHERE session_id=?', (sid,)).fetchone()
+            if row:
+                return DiagnosticCase.model_validate_json(row['payload_json'])
+            return DiagnosticCase(session_id=sid, created_at=session['created_at'], updated_at=session['created_at'])
+
+    def save_case(self, case):
+        with self.connection() as db:
+            db.execute('BEGIN IMMEDIATE')
+            session = self._get(db, case.session_id)
+            if session['status'] in {'closed', 'resolved', 'ticket_draft_ready'}:
+                raise SessionError(409, 'Сессия не принимает изменения')
+            row = db.execute('SELECT revision FROM diagnostic_cases WHERE session_id=?', (case.session_id,)).fetchone()
+            if (row['revision'] if row else 0) != case.revision:
+                raise SessionError(409, 'Конфликт версии диагностики')
+            for evidence in case.confirmed_facts:
+                source = db.execute('SELECT role,content FROM messages WHERE id=? AND session_id=?', (evidence.message_id, case.session_id)).fetchone()
+                if not source or source['role'] != 'user' or source['content'] != evidence.text:
+                    raise SessionError(409, 'Недопустимый источник сведений')
+            updated = case.model_copy(update={'revision': case.revision + 1, 'updated_at': now()})
+            db.execute('INSERT INTO diagnostic_cases VALUES (?,?,?) ON CONFLICT(session_id) DO UPDATE SET revision=excluded.revision,payload_json=excluded.payload_json', (updated.session_id, updated.revision, updated.model_dump_json()))
+            return updated
+
+    def finish_diagnostic_turn(self, case, status, target, result):
+        with self.connection() as db:
+            db.execute('BEGIN IMMEDIATE')
+            session = self._get(db, case.session_id)
+            if session['status'] != status:
+                raise SessionError(409, 'Конфликт состояния')
+            row = db.execute('SELECT revision FROM diagnostic_cases WHERE session_id=?', (case.session_id,)).fetchone()
+            if (row['revision'] if row else 0) != case.revision:
+                raise SessionError(409, 'Конфликт версии диагностики')
+            for e in case.confirmed_facts:
+                source = db.execute('SELECT role,content FROM messages WHERE id=? AND session_id=?', (e.message_id,case.session_id)).fetchone()
+                if not source or source['role'] != 'user' or source['content'] != e.text:
+                    raise SessionError(409, 'Недопустимый источник сведений')
+            for a in case.actions:
+                if a.status == 'completed' and a.evidence_message_id not in {e.message_id for e in case.confirmed_facts}:
+                    raise SessionError(409, 'Нет подтверждения действия')
+            path = []
+            if target == 'awaiting_result' and status in {'new','clarifying'}:
+                path.append('troubleshooting')
+            if target != status:
+                path.append(target)
+            for step in path:
+                if step not in TRANSITIONS[status]:
+                    raise SessionError(409, 'Недопустимый переход состояния')
+                status = step
+            stamp = now()
+            updated = case.model_copy(update={'revision':case.revision+1,'updated_at':stamp})
+            db.execute('INSERT INTO diagnostic_cases VALUES (?,?,?) ON CONFLICT(session_id) DO UPDATE SET revision=excluded.revision,payload_json=excluded.payload_json', (case.session_id,updated.revision,updated.model_dump_json()))
+            db.execute('INSERT INTO messages(session_id,role,content,metadata_json,created_at) VALUES (?,?,?,?,?)', (case.session_id,'assistant',result.answer,json.dumps(result.model_dump(exclude={'query','answer'}),ensure_ascii=False),stamp))
+            db.execute('UPDATE sessions SET status=?,updated_at=? WHERE id=?',(status,stamp,case.session_id))

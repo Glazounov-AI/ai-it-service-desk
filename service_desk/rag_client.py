@@ -16,14 +16,14 @@ class RagClient:
         self.client = client
         self.settings = settings
 
-    async def query(self, query: str) -> RagResponse:
+    async def query(self, query: str, sources: list[str] | None = None) -> RagResponse:
         key = self.settings.rag_api_key.get_secret_value()
         headers = {'X-API-Key': key} if key else {}
         try:
             async with asyncio.timeout(self.settings.rag_timeout):
                 response = await self.client.post(
                     str(self.settings.rag_url).rstrip('/') + '/query',
-                    json={'query': query, 'mode': 'it_service_desk'}, headers=headers)
+                    json={'query': query, 'mode': 'it_service_desk'} | ({'sources': sources} if sources is not None else {}), headers=headers)
         except (TimeoutError, httpx.TimeoutException):
             raise RagError(504, 'Превышено время ожидания RAG') from None
         except httpx.RequestError:
@@ -36,7 +36,9 @@ class RagClient:
             raise RagError(502, 'Ошибка взаимодействия с RAG')
         try:
             result = RagResponse.model_validate(response.json())
-            if result.strategy != 'semantic' or result.query != query:
+            if result.strategy != ('targeted' if sources is not None else 'semantic') or result.query != query:
+                raise ValueError('Unexpected response')
+            if sources is not None and any(x.get('source') not in sources for x in result.retrieved_sources):
                 raise ValueError('Unexpected response')
             return result
         except (ValueError, ValidationError):

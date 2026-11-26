@@ -1,4 +1,5 @@
 import asyncio
+from .diagnostic_case import DiagnosticCase
 from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI, HTTPException, Request
@@ -63,6 +64,10 @@ def create_app(settings: Settings | None = None, transport=None):
     @app.get('/sessions/{session_id}', response_model=SessionResponse)
     async def get_session(session_id: str, request: Request):
         return request.app.state.sessions.repository.get(session_id)
+
+    @app.get('/sessions/{session_id}/diagnostic-case', response_model=DiagnosticCase)
+    async def diagnostic_case(session_id: str, request: Request):
+        return request.app.state.sessions.repository.get_case(session_id)
 
     @app.get('/sessions/{session_id}/messages', response_model=list[MessageResponse])
     async def messages(session_id: str, request: Request):

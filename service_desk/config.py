@@ -9,6 +9,7 @@ class Settings(BaseModel):
     rag_timeout: float = Field(default=25, gt=0, le=25)
 
     generation_confidence_threshold: float = Field(default=0.8, ge=0, le=1)
+    managed_diagnostics: bool = False
     generation_enabled: bool = False
     generation_key: SecretStr = SecretStr('')
     generation_timeout: float = Field(default=10, gt=0, le=15)
@@ -20,6 +21,7 @@ class Settings(BaseModel):
                    rag_api_key=os.getenv('SERVICE_DESK_RAG_API_KEY', ''),
                    rag_timeout=os.getenv('SERVICE_DESK_RAG_TIMEOUT', '25'),
                    generation_confidence_threshold=os.getenv('SERVICE_DESK_GENERATION_CONFIDENCE_THRESHOLD', '0.8'),
+                   managed_diagnostics=os.getenv('SERVICE_DESK_MANAGED_DIAGNOSTICS', 'false'),
                    generation_enabled=os.getenv('SERVICE_DESK_GENERATION_ENABLED', 'false'),
                    generation_key=os.getenv('SERVICE_DESK_GENERATION_KEY', ''),
                    generation_timeout=os.getenv('SERVICE_DESK_GENERATION_TIMEOUT', '10'))
