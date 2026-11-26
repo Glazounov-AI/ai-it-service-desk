@@ -1,4 +1,7 @@
+import asyncio
 from contextlib import contextmanager
+from .context import build_context
+from .rag_client import RagError
 from .storage import SessionError
 
 
@@ -24,8 +27,14 @@ class SessionService:
             if self.consultation is None:
                 raise RuntimeError('Consultation service required')
             safe, classification = self.consultation.prepare(query)
+            context = build_context(self.repository.recent_messages(sid), self.consultation.safety)
             self.repository.append(sid, 'user', safe.text, {'classification': classification.model_dump()})
-            result = await self.consultation.execute(safe, classification)
+            try:
+                async with asyncio.timeout(28):
+                    classification = await self.consultation.classify(safe, classification, context)
+                    result = await self.consultation.execute(safe, classification)
+            except TimeoutError:
+                raise RagError(504, 'Превышено общее время ожидания') from None
             self.repository.append(sid, 'assistant', result.answer,
                                    result.model_dump(exclude={'query', 'answer'}))
             return result

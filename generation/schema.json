@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "properties": {
+    "domain": {
+      "type": "string",
+      "enum": [
+        "it_support",
+        "out_of_scope",
+        "uncertain"
+      ]
+    },
+    "category": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "subcategory": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "report_issue",
+        "request_instruction",
+        "provide_details",
+        "report_completed_step",
+        "report_failure",
+        "confirm_resolution",
+        "request_escalation",
+        "request_admin_action",
+        "unknown"
+      ]
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "needs_clarification": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "domain",
+    "category",
+    "subcategory",
+    "intent",
+    "confidence",
+    "needs_clarification"
+  ],
+  "additionalProperties": false
+}

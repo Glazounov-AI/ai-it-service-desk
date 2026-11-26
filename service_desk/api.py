@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI, HTTPException, Request
@@ -17,6 +18,8 @@ def create_app(settings: Settings | None = None, transport=None):
     @asynccontextmanager
     async def lifespan(app):
         config = settings or Settings.from_env()
+        if config.generation_enabled and not config.generation_key.get_secret_value():
+            raise ValueError("Generation key required")
         async with httpx.AsyncClient(timeout=config.rag_timeout, transport=transport,
                                      follow_redirects=False, trust_env=False) as client:
             app.state.rag = RagClient(client, config)
@@ -38,7 +41,12 @@ def create_app(settings: Settings | None = None, transport=None):
     async def consult(body: ConsultationRequest, request: Request):
         try:
             service = request.app.state.consultation
-            return await service.execute(*service.prepare(body.query))
+            async with asyncio.timeout(28):
+                safe, classification = service.prepare(body.query)
+                classification = await service.classify(safe, classification)
+                return await service.execute(safe, classification)
+        except TimeoutError:
+            raise HTTPException(status_code=504, detail="Превышено общее время ожидания") from None
         except RagError as exc:
             raise HTTPException(status_code=exc.status, detail=str(exc)) from None
 

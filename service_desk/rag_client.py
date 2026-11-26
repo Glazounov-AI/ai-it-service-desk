@@ -41,3 +41,31 @@ class RagClient:
             return result
         except (ValueError, ValidationError):
             raise RagError(502, 'Некорректный ответ RAG') from None
+
+    async def generate_classification(self, payload):
+        key = self.settings.generation_key.get_secret_value()
+        headers = {'X-Generation-Key': key}
+        if self.settings.rag_api_key.get_secret_value():
+            headers['X-API-Key'] = self.settings.rag_api_key.get_secret_value()
+        try:
+            async with asyncio.timeout(self.settings.generation_timeout):
+                response = await self.client.post(
+                    str(self.settings.rag_url).rstrip('/') + '/generate',
+                    json={'profile': 'it_service_desk_classifier', 'input': payload}, headers=headers)
+        except (TimeoutError, httpx.TimeoutException):
+            raise RagError(504, 'generation_timeout') from None
+        except httpx.RequestError:
+            raise RagError(503, 'generation_connection_error') from None
+        if response.status_code != 200:
+            raise RagError(response.status_code, 'generation_http_error')
+        try:
+            data = response.json()
+            if data['profile'] != 'it_service_desk_classifier' or not isinstance(data['result'], dict):
+                raise ValueError()
+            usage = data.get('usage', {})
+            if not isinstance(usage, dict):
+                usage = {}
+            return data['result'], {k: v for k, v in usage.items()
+                if k in ('input_tokens', 'output_tokens', 'embedding_tokens') and type(v) is int and v >= 0}
+        except (ValueError, KeyError, TypeError):
+            raise RagError(502, 'invalid_generation_response') from None

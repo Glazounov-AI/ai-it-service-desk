@@ -107,3 +107,9 @@ class SQLiteRepository:
                 item['metadata'] = json.loads(item.pop('metadata_json'))
                 result.append(item)
             return result
+
+    def recent_messages(self, sid):
+        with self.connection() as db:
+            self._get(db, sid)
+            rows = db.execute('SELECT role,content FROM messages WHERE session_id=? ORDER BY id DESC LIMIT 6', (sid,)).fetchall()
+            return [dict(row) for row in reversed(rows)]
