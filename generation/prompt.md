@@ -31,3 +31,5 @@ VPN/AUTHENTICATION
 VPN/CLIENT_START
 VPN/CONNECTION
 VPN/RESOURCE_ACCESS
+
+Mandatory clarification: a generic failure of Outlook, network or VPN does not establish a specific symptom. An error number without application context does not establish a product. A Windows navigation question without the setting or relevant version requires clarification. Never infer these missing facts from confidence alone.

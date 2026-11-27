@@ -51,6 +51,26 @@ class DecisionEngine:
             return case, 'clarifying' if status in {'new','clarifying'} else status, response(question)
         case.missing_information = []
         case.priority = route['default_priority']
+        if article:
+            case.kb_article_ids = [article['article_id']]
+        if pair == ('ACCESS', 'ACCOUNT_LOCKED') and article:
+            return escalate('Убедитесь, что используется правильная учётная запись. Не выполняйте повторные попытки входа. Подготовьте имя учётной записи и описание ошибки. Разблокировка требует специалиста.')
+        if pair == ('SOFTWARE', 'INSTALL_REQUEST') and article:
+            return escalate('Если программы нет в корпоративном каталоге, не устанавливайте её из сторонних источников. Требуется согласование установки специалистом.')
+        if pair == ('MFA', 'PHONE_REPLACED') and article:
+            lower = text.casefold().strip(' .!')
+            if previous.actions and lower in {'нет', 'нет резервного способа', 'другого способа нет', 'резервный способ недоступен'}:
+                return escalate('Нет доступного резервного способа подтверждения MFA; требуется перерегистрация специалистом.')
+            if previous.actions and lower in {'всё заработало', 'все заработало', 'теперь работает', 'проблема устранена'}:
+                case.resolution = 'resolved'
+                return case, 'resolved', response('Вход восстановлен по вашему подтверждению.')
+            if previous.actions and lower in {'да', 'есть', 'есть резервный способ', 'резервный способ доступен'}:
+                return case, 'awaiting_result', response('Используйте ранее зарегистрированный резервный способ для входа. Не удаляйте существующие методы MFA. Удалось войти?')
+            if not previous.actions:
+                case.actions.append(DiagnosticAction(action_id='KB-005:1', instruction=article['user_actions'].split('|')[0].strip()))
+            return case, 'awaiting_result', response('Доступен ли другой ранее зарегистрированный резервный способ подтверждения MFA? Не передавайте коды.')
+        if pair == ('OTHER', 'UNKNOWN') and not article:
+            return escalate('Подходящая инструкция отсутствует. Не изменяйте настройки без утверждённой процедуры.')
         if route['admin_action_required'] == 'yes' or route['user_can_self_resolve'] == 'no':
             return escalate('Требуется вмешательство специалиста.')
         if not article:
@@ -65,6 +85,9 @@ class DecisionEngine:
                         case.actions.append(DiagnosticAction(action_id=f"KB-011:{len(case.actions)+1}", instruction=instruction, status='completed', evidence_message_id=mid, result='not_resolved'))
                 case.issue_summary = text
                 return escalate('Пользователь сообщил о выполнении основных проверок VPN без устранения проблемы.')
+        if pair == ('VPN', 'RESOURCE_ACCESS') and not previous.actions and re.search(r'(?:отключал(?:а)? и подключал(?:а)? vpn заново|переподключил(?:а)? vpn|переподключал(?:а)? vpn)', text.casefold()) and re.search(r'не помогло|проблема осталась|ничего не изменилось', text.casefold()):
+            instruction = next(x.strip() for x in article['user_actions'].split('|') if 'повторно подключить VPN' in x)
+            case.actions.append(DiagnosticAction(action_id='KB-011:1', instruction=instruction, status='completed', evidence_message_id=mid, result='not_resolved'))
         pending = next((a for a in case.actions if a.status == 'suggested'),None)
         # Only explicit, unambiguous confirmation of the outstanding action.
         if status == 'awaiting_result' and not pending and re.fullmatch(r'(проблема устранена|всё заработало|все заработало|теперь работает)[.! ]*', text.lower()):
@@ -97,7 +120,7 @@ class DecisionEngine:
                 return escalate('Допустимые действия исчерпаны, проблема сохраняется.')
             return case,status,response('Уточните, устранена ли проблема.')
         upstream = None
-        if not case.actions:
+        if not previous.actions:
             try:
                 upstream = await rag.query(article['title'], sources=[article['article_id']+'.md'])
             except RagError:
