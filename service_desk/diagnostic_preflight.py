@@ -21,10 +21,11 @@ def preflight(safe, baseline, case, status):
     if case.category == 'MFA' and case.subcategory == 'PHONE_REPLACED' and status == 'awaiting_result' and q in {'да', 'нет', 'есть', 'нет резервного способа', 'другого способа нет', 'резервный способ недоступен', 'есть резервный способ', 'резервный способ доступен', 'всё заработало', 'все заработало', 'теперь работает', 'проблема устранена'}:
         return baseline.model_copy(update=dict(domain='it_support', category='MFA', subcategory='PHONE_REPLACED', priority=case.priority, intent='provide_details', confidence=1.0, method='rules', needs_clarification=False, clarification_question=None, kb_available=True, generation_reason='diagnostic_preflight'))
     if status == 'awaiting_result' and case.category and case.subcategory and case.subcategory != 'PHONE_REPLACED' and baseline.domain != 'out_of_scope':
-        from .action_results import interpret
+        from .action_results import interpret_pending
         pending = next((a for a in case.actions if a.status == 'suggested'), None)
-        if pending and pending.action_type and interpret(pending.action_type, safe.text) in {'information_reported','information_unavailable','check_positive','check_negative'}:
-            return baseline.model_copy(update=dict(domain='it_support', category=case.category, subcategory=case.subcategory, priority=case.priority, intent='provide_details', confidence=1.0, method='rules', needs_clarification=False, clarification_question=None, kb_available=True, generation_reason='diagnostic_preflight'))
+        outcome = interpret_pending(pending, safe.text) if pending and pending.action_type else None
+        if outcome in {'information_reported','information_unavailable','check_positive','check_negative','not_resolved'}:
+            return baseline.model_copy(update=dict(domain='it_support', category=case.category, subcategory=case.subcategory, priority=case.priority, intent='report_failure' if outcome == 'not_resolved' else 'provide_details', confidence=1.0, method='rules', needs_clarification=False, clarification_question=None, kb_available=True, generation_reason='diagnostic_preflight'))
     if baseline.domain == 'out_of_scope':
         return None
     resolved = re.fullmatch(r'проблема устранена|всё заработало|все заработало|теперь работает', q)

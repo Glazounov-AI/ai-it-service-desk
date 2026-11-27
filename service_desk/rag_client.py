@@ -67,6 +67,29 @@ class RagClient:
         except (ValueError, ValidationError):
             raise RagError(502, 'Некорректный ответ RAG') from None
 
+    async def retrieve(self, query: str, sources: list[str]) -> RagResponse:
+        key = self.settings.rag_api_key.get_secret_value()
+        try:
+            response = await self._post('/retrieve', {'query': query, 'mode': 'it_service_desk', 'sources': sources}, {'X-API-Key': key}, self.settings.rag_timeout)
+            data = response.json()
+            chunks = data['chunks']
+            usage = data['usage']
+            if data['strategy'] != 'targeted' or not isinstance(chunks, list) or not isinstance(usage, dict):
+                raise ValueError()
+            if any(usage.get(k) != 0 for k in ('input_tokens', 'output_tokens')):
+                raise ValueError()
+            if any(not isinstance(c, dict) or c.get('source') not in sources or not isinstance(c.get('text'), str) or not c['text'] for c in chunks):
+                raise ValueError()
+            return RagResponse(query=query, answer='Поиск завершён.', from_cache=False, model='retrieval-only', strategy='targeted', retrieved_sources=[{'source': c['source'], 'distance': c.get('distance')} for c in chunks], usage={k: usage[k] for k in ('input_tokens','output_tokens','embedding_tokens') if k in usage})
+        except UpstreamStatus as exc:
+            raise RagError(exc.status if exc.status in (429,503,504) else 502, 'Ошибка поиска RAG') from None
+        except (TimeoutError, httpx.TimeoutException):
+            raise RagError(504, 'Превышено время ожидания RAG') from None
+        except httpx.RequestError:
+            raise RagError(503, 'RAG недоступен') from None
+        except (ValueError, KeyError, TypeError):
+            raise RagError(502, 'Некорректный ответ поиска RAG') from None
+
     async def generate_classification(self, payload):
         key = self.settings.generation_key.get_secret_value()
         headers = {'X-Generation-Key': key}

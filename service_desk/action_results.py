@@ -36,3 +36,20 @@ def interpret(action_type, text):
         if q in {'нет','не работает','недоступен','недоступна','не подключен','не подключён','не включен','не включён','не отображается'}:
             return 'check_negative'
     return None
+
+
+def interpret_pending(action, text):
+    """Recognize explicit evidence only for the outstanding instruction."""
+    q = text.casefold().strip(' .!')
+    instruction = action.instruction.casefold()
+    if 'повторно подключить vpn' in instruction and re.fullmatch(r'переподключил(?:а|ся|ась)?(?: vpn)?,? (?:но )?(?:не помогло|ничего не изменилось|проблема осталась)', q):
+        return 'not_resolved'
+    if 'состояние connected' in instruction and re.fullmatch(r'vpn показывает connected', q):
+        return 'check_positive'
+    if 'другому корпоративному ресурсу' in instruction and re.fullmatch(r'другой корпоративный ресурс (?:тоже )?недоступен', q):
+        return 'check_negative'
+    if 'какие именно ресурсы' in instruction and re.fullmatch(r'недоступны корпоративный портал и файловый сервер', q):
+        return 'information_reported'
+    if q.startswith('переподключился') and 'повторно подключить vpn' not in instruction:
+        return None
+    return interpret(action.action_type, text)

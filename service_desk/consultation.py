@@ -10,6 +10,8 @@ class ConsultationService:
         self.rag = rag
         self.safety = safety
         self.classifier = classifier
+        from .decision import DecisionEngine
+        self.articles = DecisionEngine().articles
 
     def prepare(self, query):
         safe = self.safety.inspect(query)
@@ -29,7 +31,8 @@ class ConsultationService:
         elif self.rag.settings.generation_enabled and classification.needs_clarification:
             result = RagResponse(query=safe.text, answer=classification.clarification_question or 'Уточните проблему.', from_cache=False, model='local-clarification')
         else:
-            result = await self.rag.query(safe.text)
+            article = self.articles.get((classification.category, classification.subcategory)) if self.rag.settings.targeted_consultation and classification.domain == "it_support" and not classification.needs_clarification else None
+            result = await self.rag.query(safe.text, sources=[article["article_id"] + ".md"]) if article else await self.rag.query(safe.text)
         data = self.safety.clean(result.model_dump())
         data['classification'] = classification.model_dump()
         return RagResponse.model_validate(data)

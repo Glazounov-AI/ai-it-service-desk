@@ -6,7 +6,7 @@ from pathlib import Path
 from .diagnostic_case import DiagnosticAction, observe
 from .models import RagResponse
 from .rag_client import RagError
-from .action_results import kind, interpret
+from .action_results import kind, interpret_pending
 
 
 class DecisionEngine:
@@ -20,7 +20,7 @@ class DecisionEngine:
     async def decide(self, case, mid, safe, classification, status, rag):
         text = safe.text
         def response(answer, upstream=None):
-            data = upstream.model_dump() if upstream else dict(query=text, answer=answer, model='local-decision', from_cache=False)
+            data = upstream.model_dump() if upstream else dict(query=text, answer=answer, model='local-decision', from_cache=False, strategy='local')
             data.update(query=text, answer=answer, classification=classification.model_dump())
             return RagResponse.model_validate(data)
         if safe.flags or classification.domain == 'out_of_scope':
@@ -114,9 +114,7 @@ class DecisionEngine:
             return case, 'resolved', response('Проблема устранена по вашему подтверждению.')
         if pending and status == 'awaiting_result':
             action_type = kind(article, pending.instruction)
-            outcome = interpret(action_type, text)
-            if text.casefold().startswith('переподключился') and 'повторно подключить VPN' not in pending.instruction:
-                outcome = None
+            outcome = interpret_pending(pending.model_copy(update={'action_type': action_type}), text)
             if outcome == 'resolved':
                 case.resolution = 'resolved'
                 return case,'resolved',response('Проблема устранена по вашему подтверждению.')
@@ -145,9 +143,10 @@ class DecisionEngine:
                 return escalate('Допустимые действия исчерпаны, проблема сохраняется.')
             return escalate('Допустимые действия исчерпаны; устранение проблемы не подтверждено.')
         upstream = None
-        if not previous.actions:
+        if not previous.actions and rag.settings.diagnostic_lookup != "local":
             try:
-                upstream = await rag.query(article['title'], sources=[article['article_id']+'.md'])
+                lookup = rag.retrieve if rag.settings.diagnostic_lookup == "retrieve" else rag.query
+                upstream = await lookup(article['title'], sources=[article['article_id']+'.md'])
             except RagError:
                 return case,status,response('База знаний временно недоступна. Повторите запрос позже.')
             if not upstream.retrieved_sources:

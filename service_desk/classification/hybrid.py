@@ -22,8 +22,12 @@ async def refine(rag, classifier, safe, baseline, context):
     usage = {}
     def finish(reason, result=baseline, status=None):
         logger.info('classification reason=%s http_status=%s', reason, status)
-        return result.model_copy(update={'generation_usage': usage,
+        result = result.model_copy(update={'generation_usage': usage,
             'generation_reason': reason, 'generation_http_status': status})
+        from .fallback import unavailable_domain, NEUTRAL_QUESTION
+        if unavailable_domain(result):
+            result = result.model_copy(update={"clarification_question": NEUTRAL_QUESTION})
+        return result
     if safe.flags:
         return finish('safety_blocked')
     if not rag.settings.generation_enabled:
