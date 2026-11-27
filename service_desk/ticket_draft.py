@@ -59,13 +59,13 @@ class TicketDraftBuilder:
         for a in case.actions:
             if a.status == 'completed' and a.evidence_message_id not in facts:
                 raise ValueError('Action lacks evidence')
-        missing = list(case.missing_information)
+        missing = list(case.missing_information) + [a.instruction for a in case.actions if a.result == 'information_unavailable']
         # D18: generic completion does not establish the collected information.
-        # Until typed collection exists, conservatively leave resource names unknown.
-        if (case.category, case.subcategory) == ('VPN', 'RESOURCE_ACCESS'):
+        # Require a typed report for the resource collection step.
+        if (case.category, case.subcategory) == ('VPN', 'RESOURCE_ACCESS') and not any(a.result == 'information_reported' and 'ресурсы недоступны' in a.instruction for a in case.actions):
             missing.append('Названия недоступных корпоративных ресурсов не подтверждены структурированными данными.')
         instructions = {x.strip() for x in article['user_actions'].split('|') if x.strip()} if article and case.kb_article_ids else set()
-        completed = {a.instruction for a in case.actions if a.status == 'completed' and a.result == 'not_resolved'}
+        completed = {a.instruction for a in case.actions if a.status == 'completed' and a.result in {'not_resolved', 'check_positive', 'check_negative', 'unknown', 'information_reported', 'information_unavailable'}}
         if (case.category, case.subcategory) == ('VPN', 'RESOURCE_ACCESS'):
             # TS-022: remediation checks, not information collection.
             instructions = {x for x in instructions if 'повторно подключить VPN' in x or 'другому корпоративному ресурсу' in x}

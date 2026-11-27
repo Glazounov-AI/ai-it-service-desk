@@ -4,7 +4,9 @@ from .diagnostic_case import DiagnosticCase
 from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from fastapi.exceptions import RequestValidationError
 from .safety import SafetyFilter
 from .classification.classifier import Classifier
@@ -94,6 +96,13 @@ def create_app(settings: Settings | None = None, transport=None):
     @app.post('/sessions/{session_id}/close', response_model=SessionResponse)
     async def close_session(session_id: str, request: Request):
         return request.app.state.sessions.close(session_id)
+
+    web_dir = Path(__file__).resolve().parent / "web"
+    app.mount("/ui-assets", StaticFiles(directory=web_dir), name="ui-assets")
+
+    @app.get("/", include_in_schema=False)
+    async def web_ui():
+        return FileResponse(web_dir / "index.html", headers={"Cache-Control": "no-store"})
 
     return app
 

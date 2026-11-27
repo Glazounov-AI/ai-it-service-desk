@@ -5,6 +5,7 @@ from pathlib import Path
 from .diagnostic_case import DiagnosticAction, observe
 from .models import RagResponse
 from .rag_client import RagError
+from .action_results import kind, interpret
 
 
 class DecisionEngine:
@@ -49,7 +50,7 @@ class DecisionEngine:
             question = ('VPN-клиент не запускается, не проходит авторизация, не устанавливается соединение или недоступны внутренние ресурсы?' if case.category == 'VPN' else classification.clarification_question or 'Уточните проблему и сообщение об ошибке.')
             case.missing_information = [question]
             return case, 'clarifying' if status in {'new','clarifying'} else status, response(question)
-        case.missing_information = []
+        case.missing_information = [a.instruction for a in case.actions if a.result == 'information_unavailable']
         case.priority = route['default_priority']
         if article:
             case.kb_article_ids = [article['article_id']]
@@ -59,16 +60,31 @@ class DecisionEngine:
             return escalate('Если программы нет в корпоративном каталоге, не устанавливайте её из сторонних источников. Требуется согласование установки специалистом.')
         if pair == ('MFA', 'PHONE_REPLACED') and article:
             lower = text.casefold().strip(' .!')
-            if previous.actions and lower in {'нет', 'нет резервного способа', 'другого способа нет', 'резервный способ недоступен'}:
-                return escalate('Нет доступного резервного способа подтверждения MFA; требуется перерегистрация специалистом.')
-            if previous.actions and lower in {'всё заработало', 'все заработало', 'теперь работает', 'проблема устранена'}:
+            steps = [x.strip() for x in article['user_actions'].split('|')]
+            yes = {'да', 'есть', 'есть резервный способ', 'резервный способ доступен'}
+            no = {'нет', 'нет резервного способа', 'другого способа нет', 'резервный способ недоступен', 'не помогло', 'ничего не изменилось'}
+            if not previous.actions:
+                case.actions.append(DiagnosticAction(action_id='KB-005:1', instruction=steps[0], action_type='check'))
+                return case, 'awaiting_result', response('Доступен ли другой ранее зарегистрированный резервный способ подтверждения MFA? Не передавайте коды.')
+            pending = next((a for a in case.actions if a.status == 'suggested'), None)
+            if lower in {'всё заработало', 'все заработало', 'теперь работает', 'проблема устранена'} or (pending and pending.action_id == 'KB-005:2' and lower == 'да'):
+                if pending:
+                    pending.status, pending.evidence_message_id, pending.result = 'completed', mid, 'resolved'
                 case.resolution = 'resolved'
                 return case, 'resolved', response('Вход восстановлен по вашему подтверждению.')
-            if previous.actions and lower in {'да', 'есть', 'есть резервный способ', 'резервный способ доступен'}:
+            if pending and lower in no:
+                pending.status, pending.evidence_message_id, pending.result = 'completed', mid, 'check_negative' if pending.action_id == 'KB-005:1' else 'not_resolved'
+                return escalate('Резервный способ MFA недоступен или вход не восстановлен; требуется специалист.')
+            if pending and pending.action_id == 'KB-005:1' and lower in yes:
+                pending.status, pending.evidence_message_id, pending.result = 'completed', mid, 'check_positive'
+                case.actions.append(DiagnosticAction(action_id='KB-005:2', instruction=steps[1], action_type='remediation'))
                 return case, 'awaiting_result', response('Используйте ранее зарегистрированный резервный способ для входа. Не удаляйте существующие методы MFA. Удалось войти?')
-            if not previous.actions:
-                case.actions.append(DiagnosticAction(action_id='KB-005:1', instruction=article['user_actions'].split('|')[0].strip()))
-            return case, 'awaiting_result', response('Доступен ли другой ранее зарегистрированный резервный способ подтверждения MFA? Не передавайте коды.')
+            if pending:
+                pending.unrecognized_replies += 1
+                if pending.unrecognized_replies < 2:
+                    return case, 'awaiting_result', response('Уточните: удалось войти?' if pending.action_id == 'KB-005:2' else 'Доступен ли резервный способ MFA?')
+                case.missing_information.append(pending.instruction)
+            return escalate('Результат проверки MFA не подтверждён; требуется специалист.')
         if pair == ('OTHER', 'UNKNOWN') and not article:
             return escalate('Подходящая инструкция отсутствует. Не изменяйте настройки без утверждённой процедуры.')
         if route['admin_action_required'] == 'yes' or route['user_can_self_resolve'] == 'no':
@@ -94,21 +110,27 @@ class DecisionEngine:
             case.resolution = 'resolved'
             return case, 'resolved', response('Проблема устранена по вашему подтверждению.')
         if pending and status == 'awaiting_result':
-            lower = text.lower().strip(' .!')
-            resolved = bool(re.fullmatch(r'(проблема устранена|всё заработало|все заработало|теперь работает)',lower))
-            failed = bool(re.fullmatch(r'(не помогло|ничего не изменилось|переподключился, но ничего не изменилось)',lower))
-            completed = bool(re.fullmatch(r'(выполнил|выполнила|сделал|сделала)',lower))
-            if lower.startswith('переподключился') and 'повторно подключить VPN' not in pending.instruction:
-                failed = False
-            if resolved:
+            action_type = kind(article, pending.instruction)
+            outcome = interpret(action_type, text)
+            if text.casefold().startswith('переподключился') and 'повторно подключить VPN' not in pending.instruction:
+                outcome = None
+            if outcome == 'resolved':
                 case.resolution = 'resolved'
                 return case,'resolved',response('Проблема устранена по вашему подтверждению.')
-            if failed or completed:
-                pending.status = 'completed'
-                pending.evidence_message_id = mid
-                pending.result = 'not_resolved' if failed else 'unknown'
-            else:
-                return case,status,response('Уточните результат действия: '+pending.instruction)
+            if outcome is None:
+                # Count consecutive unrecognized replies to this same action.
+                attempts = pending.unrecognized_replies + 1
+                pending.unrecognized_replies = attempts
+                if attempts >= 2:
+                    case.missing_information.append(pending.instruction)
+                    return escalate('Не удалось однозначно установить результат действия. Требуется уточнение специалистом.')
+                hint = {'information':'Укажите «Текст ошибки: ...», «Ресурсы: ...» или «Не отображается».', 'check':'Ответьте «Да» или «Нет» либо опишите состояние.', 'remediation':'Ответьте «Выполнил», «Не помогло» или «Проблема устранена».'}[action_type]
+                return case,status,response(pending.instruction+'. '+hint)
+            pending.status = 'completed'
+            pending.evidence_message_id = mid
+            pending.result = outcome
+            if outcome == 'information_unavailable':
+                case.missing_information.append(pending.instruction)
         instructions = [x.strip() for x in article['user_actions'].split('|') if x.strip()]
         # VPN connection already reported: start with reconnect, then remaining checks.
         if pair == ('VPN','RESOURCE_ACCESS'):
@@ -116,9 +138,9 @@ class DecisionEngine:
         done = {a.instruction for a in case.actions if a.status == 'completed'}
         next_step = next((x for x in instructions if x not in done),None)
         if next_step is None:
-            if case.actions and case.actions[-1].result == 'not_resolved':
+            if case.actions and case.actions[-1].result in {'not_resolved','information_reported','information_unavailable','check_negative'}:
                 return escalate('Допустимые действия исчерпаны, проблема сохраняется.')
-            return case,status,response('Уточните, устранена ли проблема.')
+            return escalate('Допустимые действия исчерпаны; устранение проблемы не подтверждено.')
         upstream = None
         if not previous.actions:
             try:
@@ -127,5 +149,5 @@ class DecisionEngine:
                 return case,status,response('База знаний временно недоступна. Повторите запрос позже.')
             if not upstream.retrieved_sources:
                 return escalate('Статья отсутствует в поисковом индексе.')
-        case.actions.append(DiagnosticAction(action_id=f"{article['article_id']}:{len(case.actions)+1}",instruction=next_step))
+        case.actions.append(DiagnosticAction(action_id=f"{article['article_id']}:{len(case.actions)+1}",instruction=next_step, action_type=kind(article,next_step)))
         return case,'awaiting_result',response(next_step+'. Сообщите результат.',upstream)

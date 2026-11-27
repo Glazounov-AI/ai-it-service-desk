@@ -1,0 +1,3 @@
+# F4A — local web interface
+
+FastAPI serves `/` and `/ui-assets/`; existing API contracts unchanged. No frontend dependencies. Browser uses same-origin session endpoints. Current session ID only is stored in localStorage; history is fetched from backend and rendered with textContent. New session does not delete previous sessions. No automatic retries; refresh after errors. Terminal states disable sending. Managed diagnostics must be enabled in environment. Local development only: no authentication or ownership enforcement. No session list or recovery of older IDs, no cross-tab synchronization. F4B will add diagnostic case, sources and ticket draft panels. Browser interaction requires manual verification; HTTP tests do not replace browser tests.

@@ -1,3 +1,4 @@
+from .clarification import resolve
 import asyncio
 from .diagnostic_case import observe
 from .decision import DecisionEngine
@@ -37,6 +38,8 @@ class SessionService:
                 async with asyncio.timeout(28):
                     case = self.repository.get_case(sid)
                     local = preflight(safe, classification, case, self.repository.get(sid)["status"]) if self.engine else None
+                    if self.engine and local is None:
+                        local = resolve(safe, classification, case, self.repository.get(sid)['status'], self.consultation.classifier)
                     classification = local if local is not None else await self.consultation.classify(safe, classification, context)
                     if self.engine:
                         status = self.repository.get(sid)['status']

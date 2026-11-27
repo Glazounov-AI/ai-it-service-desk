@@ -14,6 +14,8 @@ class DiagnosticAction(BaseModel):
     status: Literal['suggested', 'completed'] = 'suggested'
     evidence_message_id: int | None = None
     result: str | None = None
+    action_type: str | None = None
+    unrecognized_replies: int = 0
 
 
 class DiagnosticCase(BaseModel):
