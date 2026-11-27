@@ -1,3 +1,4 @@
+from .observability import remaining, request_id, stage
 import asyncio
 import httpx
 from pydantic import ValidationError
@@ -11,25 +12,47 @@ class RagError(Exception):
         super().__init__(message)
 
 
+class UpstreamStatus(Exception):
+    def __init__(self, status):
+        self.status = status
+        super().__init__(f"HTTP {status}")
+
+
 class RagClient:
     def __init__(self, client: httpx.AsyncClient, settings: Settings):
         self.client = client
         self.settings = settings
 
+    async def _post(self, path, payload, headers, cap):
+        with stage(path):
+            timeout = remaining(cap)
+            if timeout <= 0.75:
+                raise TimeoutError("Insufficient upstream budget")
+            headers = dict(headers)
+            if request_id.get():
+                headers['X-Request-ID'] = request_id.get()
+            headers['X-Request-Budget-Ms'] = str(max(1, int((timeout-0.75)*1000)))
+            async with asyncio.timeout(timeout):
+                response = await self.client.post(str(self.settings.rag_url).rstrip('/') + path, json=payload, headers=headers)
+                if response.status_code != 200:
+                    raise UpstreamStatus(response.status_code)
+                return response
+
     async def query(self, query: str, sources: list[str] | None = None) -> RagResponse:
         key = self.settings.rag_api_key.get_secret_value()
         headers = {'X-API-Key': key} if key else {}
         try:
-            async with asyncio.timeout(self.settings.rag_timeout):
-                response = await self.client.post(
-                    str(self.settings.rag_url).rstrip('/') + '/query',
-                    json={'query': query, 'mode': 'it_service_desk'} | ({'sources': sources} if sources is not None else {}), headers=headers)
+            response = await self._post('/query', {'query': query, 'mode': 'it_service_desk'} | ({'sources': sources} if sources is not None else {}), headers=headers, cap=self.settings.rag_timeout)
+        except UpstreamStatus as exc:
+            raise RagError(exc.status if exc.status in (429, 503, 504) else 502, "Ошибка взаимодействия с RAG") from None
         except (TimeoutError, httpx.TimeoutException):
             raise RagError(504, 'Превышено время ожидания RAG') from None
         except httpx.RequestError:
             raise RagError(503, 'RAG недоступен') from None
         if response.status_code == 429:
             raise RagError(429, 'Лимит запросов RAG. Повторите позже.')
+        if response.status_code == 503:
+            raise RagError(503, 'RAG недоступен')
         if response.status_code == 504:
             raise RagError(504, 'Превышено время ожидания RAG')
         if response.status_code != 200:
@@ -50,10 +73,9 @@ class RagClient:
         if self.settings.rag_api_key.get_secret_value():
             headers['X-API-Key'] = self.settings.rag_api_key.get_secret_value()
         try:
-            async with asyncio.timeout(self.settings.generation_timeout):
-                response = await self.client.post(
-                    str(self.settings.rag_url).rstrip('/') + '/generate',
-                    json={'profile': 'it_service_desk_classifier', 'input': payload}, headers=headers)
+            response = await self._post('/generate', {'profile': 'it_service_desk_classifier', 'input': payload}, headers=headers, cap=self.settings.generation_timeout)
+        except UpstreamStatus as exc:
+            raise RagError(exc.status, 'generation_http_error') from None
         except (TimeoutError, httpx.TimeoutException):
             raise RagError(504, 'generation_timeout') from None
         except httpx.RequestError:

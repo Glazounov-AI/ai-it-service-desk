@@ -1,4 +1,5 @@
 """Conservative, opt-in session workflow; KB text is trusted local configuration."""
+from .classification.fallback import unavailable_domain, NEUTRAL_QUESTION
 import csv
 import re
 from pathlib import Path
@@ -48,6 +49,8 @@ class DecisionEngine:
             return case, 'escalation_required', response('Необходима передача в группу '+case.support_group+'. '+reason)
         if not route:
             question = ('VPN-клиент не запускается, не проходит авторизация, не устанавливается соединение или недоступны внутренние ресурсы?' if case.category == 'VPN' else classification.clarification_question or 'Уточните проблему и сообщение об ошибке.')
+            if unavailable_domain(classification) and not case.category:
+                question = NEUTRAL_QUESTION
             case.missing_information = [question]
             return case, 'clarifying' if status in {'new','clarifying'} else status, response(question)
         case.missing_information = [a.instruction for a in case.actions if a.result == 'information_unavailable']

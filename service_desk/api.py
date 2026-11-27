@@ -1,3 +1,4 @@
+from .observability import install
 from .ticket_draft import TicketDraft
 import asyncio
 from .diagnostic_case import DiagnosticCase
@@ -32,6 +33,8 @@ def create_app(settings: Settings | None = None, transport=None):
             yield
 
     app = FastAPI(title='AI IT Service Desk — development API', version='1.1.0.dev3', lifespan=lifespan)
+
+    install(app)
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request, exc):
