@@ -1,3 +1,4 @@
+from .ticket_draft import TicketDraft, TicketDraftBuilder
 from .diagnostic_case import DiagnosticCase
 import sqlite3
 import json
@@ -49,6 +50,10 @@ class SQLiteRepository:
                 CREATE TABLE IF NOT EXISTS diagnostic_cases (
                     session_id TEXT PRIMARY KEY REFERENCES sessions(id),
                     revision INTEGER NOT NULL, payload_json TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS ticket_drafts (
+                    session_id TEXT PRIMARY KEY REFERENCES sessions(id),
+                    ticket_id TEXT NOT NULL UNIQUE, payload_json TEXT NOT NULL
                 );
                 CREATE INDEX IF NOT EXISTS messages_session ON messages(session_id,id);
             ''')
@@ -173,5 +178,46 @@ class SQLiteRepository:
             stamp = now()
             updated = case.model_copy(update={'revision':case.revision+1,'updated_at':stamp})
             db.execute('INSERT INTO diagnostic_cases VALUES (?,?,?) ON CONFLICT(session_id) DO UPDATE SET revision=excluded.revision,payload_json=excluded.payload_json', (case.session_id,updated.revision,updated.model_dump_json()))
+            if status == 'escalation_required':
+                draft = self._insert_draft(db, updated, dict(session, status=status))
+                status = 'ticket_draft_ready'
+                result.answer += ' Черновик заявки подготовлен; заявка не отправлена.'
             db.execute('INSERT INTO messages(session_id,role,content,metadata_json,created_at) VALUES (?,?,?,?,?)', (case.session_id,'assistant',result.answer,json.dumps(result.model_dump(exclude={'query','answer'}),ensure_ascii=False),stamp))
             db.execute('UPDATE sessions SET status=?,updated_at=? WHERE id=?',(status,stamp,case.session_id))
+
+    def _insert_draft(self, db, case, session):
+        try:
+            draft = TicketDraftBuilder().build(case, session)
+        except ValueError:
+            raise SessionError(409, 'Недостаточно подтвержденных данных для черновика') from None
+        db.execute('INSERT INTO ticket_drafts VALUES (?,?,?)', (case.session_id, draft.ticket_id, draft.model_dump_json()))
+        return draft
+
+    def get_ticket_draft(self, sid):
+        with self.connection() as db:
+            self._get(db, sid)
+            row = db.execute('SELECT payload_json FROM ticket_drafts WHERE session_id=?', (sid,)).fetchone()
+            if not row:
+                raise SessionError(404, 'Черновик не найден')
+            return TicketDraft.model_validate_json(row['payload_json'])
+
+    def ensure_ticket_draft(self, sid):
+        with self.connection() as db:
+            db.execute('BEGIN IMMEDIATE')
+            session = self._get(db, sid)
+            row = db.execute('SELECT payload_json FROM ticket_drafts WHERE session_id=?', (sid,)).fetchone()
+            if row:
+                return TicketDraft.model_validate_json(row['payload_json'])
+            if session['status'] != 'escalation_required':
+                raise SessionError(409, 'Сессия не требует эскалации')
+            row = db.execute('SELECT payload_json FROM diagnostic_cases WHERE session_id=?', (sid,)).fetchone()
+            if not row:
+                raise SessionError(409, 'Диагностика отсутствует')
+            case = DiagnosticCase.model_validate_json(row['payload_json'])
+            for e in case.confirmed_facts:
+                source = db.execute('SELECT role,content FROM messages WHERE id=? AND session_id=?', (e.message_id,sid)).fetchone()
+                if not source or source['role'] != 'user' or source['content'] != e.text:
+                    raise SessionError(409, 'Недопустимый источник сведений')
+            draft = self._insert_draft(db, case, session)
+            db.execute('UPDATE sessions SET status=?,updated_at=? WHERE id=?', ('ticket_draft_ready',now(),sid))
+            return draft

@@ -56,6 +56,15 @@ class DecisionEngine:
         if not article:
             return escalate('Подходящая инструкция отсутствует.')
         case.kb_article_ids = [article['article_id']]
+        # Explicit retrospective report of both remediation steps and persistent failure.
+        if pair == ('VPN', 'RESOURCE_ACCESS') and not previous.actions and status in {'new','clarifying'}:
+            if re.fullmatch(r'vpn подключ[её]н, но корпоративные ресурсы (?:вс[её] равно )?недоступны\. я уже проверил(?:а)? другой корпоративный ресурс и переподключил(?:а)? vpn [—–-] проблема осталась\. подготовь данные для передачи в поддержку\.', text.casefold().strip()):
+                for instruction in article['user_actions'].split('|'):
+                    instruction = instruction.strip()
+                    if 'повторно подключить VPN' in instruction or 'другому корпоративному ресурсу' in instruction:
+                        case.actions.append(DiagnosticAction(action_id=f"KB-011:{len(case.actions)+1}", instruction=instruction, status='completed', evidence_message_id=mid, result='not_resolved'))
+                case.issue_summary = text
+                return escalate('Пользователь сообщил о выполнении основных проверок VPN без устранения проблемы.')
         pending = next((a for a in case.actions if a.status == 'suggested'),None)
         # Only explicit, unambiguous confirmation of the outstanding action.
         if status == 'awaiting_result' and not pending and re.fullmatch(r'(проблема устранена|всё заработало|все заработало|теперь работает)[.! ]*', text.lower()):

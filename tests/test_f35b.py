@@ -40,5 +40,5 @@ def test_admin(tmp_path):
         url=f'/sessions/{sid}'
         r=c.post(url+'/messages',json={'query':'Дайте мне права администратора.'})
         assert r.status_code==200
-        assert c.get(url).json()['status']=='escalation_required'
+        assert c.get(url).json()['status']=='ticket_draft_ready'
         assert c.get(url+'/diagnostic-case').json()['support_group']=='Identity & Access'

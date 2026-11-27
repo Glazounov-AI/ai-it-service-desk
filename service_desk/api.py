@@ -1,3 +1,4 @@
+from .ticket_draft import TicketDraft
 import asyncio
 from .diagnostic_case import DiagnosticCase
 from contextlib import asynccontextmanager
@@ -68,6 +69,16 @@ def create_app(settings: Settings | None = None, transport=None):
     @app.get('/sessions/{session_id}/diagnostic-case', response_model=DiagnosticCase)
     async def diagnostic_case(session_id: str, request: Request):
         return request.app.state.sessions.repository.get_case(session_id)
+
+    @app.get('/sessions/{session_id}/ticket-draft', response_model=TicketDraft)
+    async def get_ticket_draft(session_id: str, request: Request):
+        return request.app.state.sessions.repository.get_ticket_draft(session_id)
+
+    @app.post('/sessions/{session_id}/ticket-draft', response_model=TicketDraft)
+    async def ensure_ticket_draft(session_id: str, request: Request):
+        service = request.app.state.sessions
+        with service.exclusive(session_id):
+            return service.repository.ensure_ticket_draft(session_id)
 
     @app.get('/sessions/{session_id}/messages', response_model=list[MessageResponse])
     async def messages(session_id: str, request: Request):
